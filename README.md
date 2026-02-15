@@ -2,7 +2,7 @@
 
 Sistema web de gestión académica desarrollado con arquitectura MVC para el Servicio Nacional de Aprendizaje (SENA).
 
-![SENA Logo](assets/images/sena-logo.png)
+
 
 ## 📋 Descripción
 
@@ -67,22 +67,14 @@ Copiar la carpeta del proyecto a `C:\xampp\htdocs\Gestion-sena`
 2. Crear base de datos: `dashboard_sena`
 3. Importar: `_database/database.sql`
 
-### 4. Configurar conexión
 
-Editar `dashboard_sena/conexion.php`:
-
-```php
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'dashboard_sena');
-define('DB_USER', 'root');
-define('DB_PASS', '');
 ```
 
-### 5. Iniciar servicios
+### 4. Iniciar servicios
 
 Ejecutar `_scripts/ABRIR_DASHBOARD.bat` o iniciar Apache y MySQL desde XAMPP.
 
-### 6. Acceder al sistema
+### 5. Acceder al sistema
 
 Abrir navegador: `http://localhost/Gestion-sena/dashboard_sena/`
 
