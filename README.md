@@ -2,7 +2,7 @@
 
 Sistema web de gestión académica desarrollado con arquitectura MVC para el Servicio Nacional de Aprendizaje (SENA).
 
-![SENA Logo](assets/images/sena-logo.png)
+
 
 ## 📋 Descripción
 
@@ -73,8 +73,6 @@ http://localhost/Gestion-sena/dashboard_sena/migrar_bd.php
 2. Crear base de datos: `progsena`
 3. Importar: `dashboard_sena/_database/estructura_completa_ProgSENA.sql`
 
-### 4. Configurar conexión
-
 Editar `dashboard_sena/conexion.php`:
 
 ```php
@@ -84,11 +82,11 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 ```
 
-### 5. Iniciar servicios
+### 4. Iniciar servicios
 
 Ejecutar `_scripts/ABRIR_DASHBOARD.bat` o iniciar Apache y MySQL desde XAMPP.
 
-### 6. Acceder al sistema
+### 5. Acceder al sistema
 
 **Verificar instalación:**
 ```
