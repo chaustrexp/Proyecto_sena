@@ -26,6 +26,7 @@ try {
     $totalCompetenciasInstructor = $instruCompetenciaModel->count();
     $competenciasVigentes = $instruCompetenciaModel->countVigentes();
     $ultimasAsignaciones = $asignacionModel->getRecent(5);
+    $asignacionesCalendario = $asignacionModel->getForCalendar();
 } catch (Exception $e) {
     // Si hay error, simplemente mostrar arrays vacíos
     $totalProgramas = 0;
@@ -36,6 +37,7 @@ try {
     $totalCompetenciasInstructor = 0;
     $competenciasVigentes = 0;
     $ultimasAsignaciones = [];
+    $asignacionesCalendario = [];
 }
 
 $pageTitle = "Dashboard Principal";
@@ -124,6 +126,36 @@ include __DIR__ . '/views/layout/sidebar.php';
         </div>
     </div>
 
+    <!-- Calendario de Asignaciones -->
+    <div style="padding: 0 32px 24px;">
+        <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden;">
+            
+            <!-- Header del calendario -->
+            <div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 18px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">
+                        <i data-lucide="calendar-days" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 8px;"></i>
+                        Calendario de Asignaciones
+                    </h2>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0;">Vista mensual de todas las asignaciones</p>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button id="prevMonth" class="btn btn-secondary btn-sm">
+                        <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+                    </button>
+                    <span id="currentMonth" style="font-weight: 600; color: #1f2937; min-width: 150px; text-align: center;"></span>
+                    <button id="nextMonth" class="btn btn-secondary btn-sm">
+                        <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                    </button>
+                    <button id="todayBtn" class="btn btn-primary btn-sm" style="margin-left: 8px;">Hoy</button>
+                </div>
+            </div>
+
+            <!-- Calendario -->
+            <div id="calendar" style="padding: 24px;"></div>
+        </div>
+    </div>
+
     <!-- Tabla de Últimas Asignaciones -->
     <div style="padding: 0 32px 32px;">
         <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden;">
@@ -205,6 +237,141 @@ include __DIR__ . '/views/layout/sidebar.php';
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
+    // Datos de asignaciones desde PHP
+    const asignaciones = <?php echo json_encode($asignacionesCalendario); ?>;
+    
+    let currentDate = new Date();
+    let currentMonth = currentDate.getMonth();
+    let currentYear = currentDate.getFullYear();
+    
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    
+    function renderCalendar() {
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const prevLastDay = new Date(currentYear, currentMonth, 0);
+        
+        const firstDayIndex = firstDay.getDay();
+        const lastDayDate = lastDay.getDate();
+        const prevLastDayDate = prevLastDay.getDate();
+        
+        // Actualizar título del mes
+        document.getElementById('currentMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        
+        let calendarHTML = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;">';
+        
+        // Headers de días
+        dayNames.forEach(day => {
+            calendarHTML += `<div style="text-align: center; font-weight: 600; color: #6b7280; font-size: 12px; padding: 8px 0; text-transform: uppercase;">${day}</div>`;
+        });
+        
+        // Días del mes anterior
+        for (let i = firstDayIndex; i > 0; i--) {
+            calendarHTML += `<div style="min-height: 100px; padding: 8px; background: #f9fafb; border-radius: 8px; opacity: 0.5;">
+                <div style="font-size: 14px; color: #9ca3af; font-weight: 500;">${prevLastDayDate - i + 1}</div>
+            </div>`;
+        }
+        
+        // Días del mes actual
+        const today = new Date();
+        for (let day = 1; day <= lastDayDate; day++) {
+            const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+            
+            // Buscar asignaciones para este día
+            const dayAssignments = asignaciones.filter(a => {
+                const inicio = new Date(a.fecha_inicio);
+                const fin = new Date(a.fecha_fin);
+                const currentDay = new Date(currentYear, currentMonth, day);
+                return currentDay >= inicio && currentDay <= fin;
+            });
+            
+            let dayStyle = 'min-height: 100px; padding: 8px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; transition: all 0.2s;';
+            if (isToday) {
+                dayStyle = 'min-height: 100px; padding: 8px; background: #E8F5E8; border: 2px solid #39A900; border-radius: 8px; transition: all 0.2s;';
+            }
+            
+            calendarHTML += `<div style="${dayStyle}" class="calendar-day">
+                <div style="font-size: 14px; color: ${isToday ? '#39A900' : '#1f2937'}; font-weight: ${isToday ? '700' : '500'}; margin-bottom: 4px;">${day}</div>`;
+            
+            // Mostrar asignaciones
+            if (dayAssignments.length > 0) {
+                dayAssignments.slice(0, 2).forEach(asig => {
+                    calendarHTML += `<div style="background: #39A900; color: white; padding: 4px 6px; border-radius: 4px; font-size: 10px; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${asig.instructor_nombre} - Ficha ${asig.ficha_numero}">
+                        📚 ${asig.ficha_numero}
+                    </div>`;
+                });
+                if (dayAssignments.length > 2) {
+                    calendarHTML += `<div style="font-size: 10px; color: #6b7280; margin-top: 2px;">+${dayAssignments.length - 2} más</div>`;
+                }
+            }
+            
+            calendarHTML += '</div>';
+        }
+        
+        // Días del siguiente mes
+        const remainingDays = 7 - ((firstDayIndex + lastDayDate) % 7);
+        if (remainingDays < 7) {
+            for (let i = 1; i <= remainingDays; i++) {
+                calendarHTML += `<div style="min-height: 100px; padding: 8px; background: #f9fafb; border-radius: 8px; opacity: 0.5;">
+                    <div style="font-size: 14px; color: #9ca3af; font-weight: 500;">${i}</div>
+                </div>`;
+            }
+        }
+        
+        calendarHTML += '</div>';
+        document.getElementById('calendar').innerHTML = calendarHTML;
+        
+        // Hover effect en días
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            day.addEventListener('mouseenter', function() {
+                if (!this.style.background.includes('#E8F5E8')) {
+                    this.style.background = '#f9fafb';
+                    this.style.transform = 'scale(1.02)';
+                }
+            });
+            day.addEventListener('mouseleave', function() {
+                if (!this.style.background.includes('#E8F5E8')) {
+                    this.style.background = 'white';
+                    this.style.transform = 'scale(1)';
+                }
+            });
+        });
+        
+        lucide.createIcons();
+    }
+    
+    // Event listeners para navegación
+    document.getElementById('prevMonth').addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar();
+    });
+    
+    document.getElementById('nextMonth').addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar();
+    });
+    
+    document.getElementById('todayBtn').addEventListener('click', () => {
+        const today = new Date();
+        currentMonth = today.getMonth();
+        currentYear = today.getFullYear();
+        renderCalendar();
+    });
+    
+    // Renderizar calendario inicial
+    renderCalendar();
+    
     lucide.createIcons();
     
     // Hover effect en cards

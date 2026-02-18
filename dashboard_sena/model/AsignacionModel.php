@@ -139,5 +139,54 @@ class AsignacionModel {
         $stmt->execute([$limit]);
         return $stmt->fetchAll();
     }
+
+    public function getForCalendar($month = null, $year = null) {
+        if (!$month) $month = date('m');
+        if (!$year) $year = date('Y');
+
+        $stmt = $this->db->prepare("
+            SELECT a.ASIG_ID as id,
+                   f.fich_id as ficha_numero,
+                   CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
+                   amb.amb_nombre as ambiente_nombre,
+                   c.comp_nombre_corto as competencia_nombre,
+                   a.asig_fecha_ini as fecha_inicio,
+                   a.asig_fecha_fin as fecha_fin
+            FROM ASIGNACION a
+            LEFT JOIN FICHA f ON a.FICHA_fich_id = f.fich_id
+            LEFT JOIN INSTRUCTOR i ON a.INSTRUCTOR_inst_id = i.inst_id
+            LEFT JOIN AMBIENTE amb ON a.AMBIENTE_amb_id = amb.amb_id
+            LEFT JOIN COMPETENCIA c ON a.COMPETENCIA_comp_id = c.comp_id
+            WHERE YEAR(a.asig_fecha_ini) = ? OR YEAR(a.asig_fecha_fin) = ?
+            ORDER BY a.asig_fecha_ini ASC
+        ");
+        $stmt->execute([$year, $year]);
+        return $stmt->fetchAll();
+    }
+
 }
 ?>
+
+    public function getForCalendar($month = null, $year = null) {
+        if (!$month) $month = date('m');
+        if (!$year) $year = date('Y');
+        
+        $stmt = $this->db->prepare("
+            SELECT a.ASIG_ID as id,
+                   f.fich_id as ficha_numero,
+                   CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
+                   amb.amb_nombre as ambiente_nombre,
+                   c.comp_nombre_corto as competencia_nombre,
+                   a.asig_fecha_ini as fecha_inicio,
+                   a.asig_fecha_fin as fecha_fin
+            FROM ASIGNACION a
+            LEFT JOIN FICHA f ON a.FICHA_fich_id = f.fich_id
+            LEFT JOIN INSTRUCTOR i ON a.INSTRUCTOR_inst_id = i.inst_id
+            LEFT JOIN AMBIENTE amb ON a.AMBIENTE_amb_id = amb.amb_id
+            LEFT JOIN COMPETENCIA c ON a.COMPETENCIA_comp_id = c.comp_id
+            WHERE YEAR(a.asig_fecha_ini) = ? OR YEAR(a.asig_fecha_fin) = ?
+            ORDER BY a.asig_fecha_ini ASC
+        ");
+        $stmt->execute([$year, $year]);
+        return $stmt->fetchAll();
+    }
