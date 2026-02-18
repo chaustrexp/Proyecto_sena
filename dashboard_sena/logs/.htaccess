@@ -1,0 +1,3 @@
+# Denegar acceso a archivos de log desde el navegador
+Order Deny,Allow
+Deny from all

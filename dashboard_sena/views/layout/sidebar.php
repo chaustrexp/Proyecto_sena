@@ -138,7 +138,7 @@
     <div class="sidebar-footer">
         <div class="user-profile-sidebar">
             <div class="user-avatar-sidebar">
-                <img src="/Gestion-sena/assets/images/foto-perfil.jpg" alt="Foto de perfil">
+                <img src="/Gestion-sena/dashboard_sena/assets/images/foto-perfil.jpg" alt="Foto de perfil">
             </div>
             <div class="user-info-sidebar">
                 <span class="user-name-sidebar"><?php echo $_SESSION['usuario_nombre']; ?></span>

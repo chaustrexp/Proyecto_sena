@@ -1,4 +1,10 @@
 <?php
+// Cargar sistema de manejo de errores global
+require_once __DIR__ . '/../config/error_handler.php';
+
+// Cargar funciones helper globales
+require_once __DIR__ . '/../helpers/functions.php';
+
 // Archivo para proteger páginas - incluir al inicio de cada página protegida
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

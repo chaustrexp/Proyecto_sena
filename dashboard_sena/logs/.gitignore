@@ -1,0 +1,6 @@
+# Ignorar todos los archivos de log
+*.log
+
+# Mantener el directorio en git
+!.gitignore
+!.htaccess

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../auth/check_auth.php';
 require_once __DIR__ . '/../../model/ProgramaModel.php';
 require_once __DIR__ . '/../../model/TituloProgramaModel.php';
 
@@ -6,8 +7,21 @@ $model = new ProgramaModel();
 $tituloModel = new TituloProgramaModel();
 $titulos = $tituloModel->getAll();
 
-$id = $_GET['id'];
+$id = safe($_GET, 'id', 0);
+
+if (!$id) {
+    header('Location: index.php');
+    exit;
+}
+
 $registro = $model->getById($id);
+
+// Verificar si el registro existe
+if (!registroValido($registro)) {
+    $_SESSION['error'] = 'Programa no encontrado';
+    header('Location: index.php');
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $model->update($id, $_POST);
@@ -26,23 +40,32 @@ include __DIR__ . '/../layout/sidebar.php';
         <form method="POST">
             <div class="form-group">
                 <label>Código *</label>
-                <input type="text" name="codigo" class="form-control" value="<?php echo $registro['codigo']; ?>" required>
+                <input type="text" name="codigo" class="form-control" value="<?php echo safeHtml($registro, 'prog_codigo'); ?>" required>
             </div>
+            
             <div class="form-group">
-                <label>Nombre *</label>
-                <input type="text" name="nombre" class="form-control" value="<?php echo $registro['nombre']; ?>" required>
+                <label>Denominación *</label>
+                <input type="text" name="denominacion" class="form-control" value="<?php echo safeHtml($registro, 'prog_denominacion'); ?>" required>
             </div>
+            
             <div class="form-group">
-                <label>Duración (meses) *</label>
-                <input type="number" name="duracion_meses" class="form-control" value="<?php echo $registro['duracion_meses']; ?>" required>
+                <label>Tipo *</label>
+                <select name="tipo" class="form-control" required>
+                    <option value="">Seleccione...</option>
+                    <option value="Técnico" <?php echo (safe($registro, 'prog_tipo') == 'Técnico') ? 'selected' : ''; ?>>Técnico</option>
+                    <option value="Tecnólogo" <?php echo (safe($registro, 'prog_tipo') == 'Tecnólogo') ? 'selected' : ''; ?>>Tecnólogo</option>
+                    <option value="Especialización" <?php echo (safe($registro, 'prog_tipo') == 'Especialización') ? 'selected' : ''; ?>>Especialización</option>
+                </select>
             </div>
+            
             <div class="form-group">
                 <label>Título Programa</label>
                 <select name="titulo_programa_id" class="form-control">
                     <option value="">Seleccione...</option>
                     <?php foreach ($titulos as $titulo): ?>
-                        <option value="<?php echo $titulo['id']; ?>" <?php echo $registro['titulo_programa_id'] == $titulo['id'] ? 'selected' : ''; ?>>
-                            <?php echo $titulo['nombre']; ?>
+                        <option value="<?php echo safeHtml($titulo, 'titpro_id'); ?>" 
+                                <?php echo (safe($registro, 'TITULOPROGRAMA_titpro_id') == safe($titulo, 'titpro_id')) ? 'selected' : ''; ?>>
+                            <?php echo safeHtml($titulo, 'titpro_nombre'); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

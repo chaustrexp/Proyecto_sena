@@ -30,7 +30,7 @@ include __DIR__ . '/../layout/sidebar.php';
                 <select name="PROGRAMA_prog_id" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <?php foreach ($programas as $programa): ?>
-                        <option value="<?php echo $programa['prog_codigo']; ?>"><?php echo htmlspecialchars($programa['prog_denominacion']); ?></option>
+                        <option value="<?php echo safeHtml($programa, 'prog_codigo'); ?>"><?php echo safeHtml($programa, 'prog_denominacion'); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -39,7 +39,7 @@ include __DIR__ . '/../layout/sidebar.php';
                 <select name="COMPETENCIA_comp_id" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <?php foreach ($competencias as $competencia): ?>
-                        <option value="<?php echo $competencia['comp_id']; ?>"><?php echo htmlspecialchars($competencia['comp_nombre_corto']); ?> - <?php echo htmlspecialchars($competencia['comp_nombre_unidad_competencia']); ?></option>
+                        <option value="<?php echo safeHtml($competencia, 'comp_id'); ?>"><?php echo safeHtml($competencia, 'comp_nombre_corto'); ?> - <?php echo safeHtml($competencia, 'comp_nombre_unidad_competencia'); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>

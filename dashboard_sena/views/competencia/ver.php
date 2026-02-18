@@ -1,2 +1,48 @@
-<?php require_once __DIR__ . '/../../model/CompetenciaModel.php'; $model = new CompetenciaModel(); $id = $_GET['id']; $registro = $model->getById($id); $pageTitle = "Ver Competencia"; include __DIR__ . '/../layout/header.php'; include __DIR__ . '/../layout/sidebar.php'; ?>
-<div class="main-content"><div class="detail-card"><h2>Detalle de la Competencia</h2><div class="detail-row"><div class="detail-label">ID:</div><div><?php echo $registro['id']; ?></div></div><div class="detail-row"><div class="detail-label">Código:</div><div><?php echo $registro['codigo']; ?></div></div><div class="detail-row"><div class="detail-label">Nombre:</div><div><?php echo $registro['nombre']; ?></div></div><div class="detail-row"><div class="detail-label">Descripción:</div><div><?php echo $registro['descripcion']; ?></div></div><div class="detail-row"><div class="detail-label">Fecha Creación:</div><div><?php echo $registro['created_at']; ?></div></div><div class="btn-group" style="margin-top: 20px;"><a href="editar.php?id=<?php echo $registro['id']; ?>" class="btn btn-primary">Editar</a><a href="index.php" class="btn btn-secondary">Volver</a></div></div></div><?php include __DIR__ . '/../layout/footer.php'; ?>
+<?php
+require_once __DIR__ . '/../../auth/check_auth.php';
+require_once __DIR__ . '/../../model/CompetenciaModel.php';
+
+$model = new CompetenciaModel();
+$id = safe($_GET, 'id', 0);
+$registro = $model->getById($id);
+
+$pageTitle = "Ver Competencia";
+include __DIR__ . '/../layout/header.php';
+include __DIR__ . '/../layout/sidebar.php';
+?>
+
+<div class="main-content">
+    <div class="detail-card">
+        <?php if (registroValido($registro)): ?>
+            <h2>Detalle de la Competencia</h2>
+            <div class="detail-row">
+                <div class="detail-label">ID:</div>
+                <div><?php echo safeHtml($registro, 'comp_id'); ?></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">NOMBRE CORTO:</div>
+                <div><?php echo safeHtml($registro, 'comp_nombre_corto'); ?></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">NOMBRE UNIDAD COMPETENCIA:</div>
+                <div><?php echo safeHtml($registro, 'comp_nombre_unidad_competencia'); ?></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">HORAS:</div>
+                <div><?php echo safeHtml($registro, 'comp_horas'); ?></div>
+            </div>
+            <div class="btn-group" style="margin-top: 20px;">
+                <a href="editar.php?id=<?php echo safeHtml($registro, 'comp_id'); ?>" class="btn btn-primary">Editar</a>
+                <a href="index.php" class="btn btn-secondary">Volver</a>
+            </div>
+        <?php else: ?>
+            <h2>Registro no encontrado</h2>
+            <p style="padding: 20px; text-align: center; color: #666;">No se encontró la competencia solicitada.</p>
+            <div class="btn-group" style="margin-top: 20px; justify-content: center;">
+                <a href="index.php" class="btn btn-secondary">Volver al Listado</a>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<?php include __DIR__ . '/../layout/footer.php'; ?>

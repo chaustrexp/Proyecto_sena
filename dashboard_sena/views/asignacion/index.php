@@ -39,8 +39,20 @@ include __DIR__ . '/../layout/sidebar.php';
 <div class="main-content">
     <!-- Header -->
     <div style="padding: 32px 32px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb;">
-        <div>
-            <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">Asignaciones</h1>
+        <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
+                <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0;">Asignaciones</h1>
+                <?php
+                // Verificar si el controlador está disponible
+                $controladorDisponible = file_exists(__DIR__ . '/../../controller/AsignacionController.php');
+                if ($controladorDisponible):
+                ?>
+                <span style="background: linear-gradient(135deg, #39A900 0%, #007832 100%); color: white; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(57, 169, 0, 0.3);">
+                    <span style="font-size: 14px;">⚡</span>
+                    CONTROLADOR ACTIVO
+                </span>
+                <?php endif; ?>
+            </div>
             <p style="font-size: 14px; color: #6b7280; margin: 0;">Gestiona las asignaciones de instructores y ambientes</p>
         </div>
         <button onclick="abrirModalNuevaAsignacion()" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
@@ -98,23 +110,31 @@ include __DIR__ . '/../layout/sidebar.php';
 
     <!-- Calendar View -->
     <div id="calendar-view" style="display: none; padding: 0 32px 32px;">
-        <div style="background: white; border-radius: 16px; border: 1px solid #e5e7eb; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-            <!-- Calendar Legend -->
-            <div style="display: flex; gap: 24px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #f3f4f6;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 16px; height: 16px; background: #39A900; border-radius: 4px;"></div>
-                    <span style="font-size: 13px; color: #6b7280; font-weight: 500;">Activas</span>
+        <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden;">
+            
+            <!-- Header del calendario -->
+            <div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 18px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">
+                        <i data-lucide="calendar-days" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 8px;"></i>
+                        Calendario de Asignaciones
+                    </h2>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0;">Vista mensual de todas las asignaciones</p>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 16px; height: 16px; background: #D97706; border-radius: 4px;"></div>
-                    <span style="font-size: 13px; color: #6b7280; font-weight: 500;">Pendientes</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 16px; height: 16px; background: #DC2626; border-radius: 4px;"></div>
-                    <span style="font-size: 13px; color: #6b7280; font-weight: 500;">Finalizadas</span>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button id="prevMonth" class="btn btn-secondary btn-sm">
+                        <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+                    </button>
+                    <span id="currentMonth" style="font-weight: 600; color: #1f2937; min-width: 150px; text-align: center;"></span>
+                    <button id="nextMonth" class="btn btn-secondary btn-sm">
+                        <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                    </button>
+                    <button id="todayBtn" class="btn btn-primary btn-sm" style="margin-left: 8px;">Hoy</button>
                 </div>
             </div>
-            <div id="calendar"></div>
+
+            <!-- Calendario -->
+            <div id="calendar" style="padding: 24px;"></div>
         </div>
     </div>
 
@@ -244,209 +264,307 @@ include __DIR__ . '/../layout/sidebar.php';
         }
     }
 
-    // Initialize FullCalendar
+    // Datos de asignaciones desde PHP
+    const asignaciones = <?php echo json_encode($registros); ?>;
+    
+    let currentDate = new Date();
+    let currentMonth = currentDate.getMonth();
+    let currentYear = currentDate.getFullYear();
+    
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    
+    function renderCalendar() {
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const prevLastDay = new Date(currentYear, currentMonth, 0);
+        
+        const firstDayIndex = firstDay.getDay();
+        const lastDayDate = lastDay.getDate();
+        const prevLastDayDate = prevLastDay.getDate();
+        
+        // Actualizar título del mes
+        document.getElementById('currentMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        
+        let calendarHTML = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;">';
+        
+        // Headers de días
+        dayNames.forEach(day => {
+            calendarHTML += `<div style="text-align: center; font-weight: 600; color: #6b7280; font-size: 12px; padding: 8px 0; text-transform: uppercase;">${day}</div>`;
+        });
+        
+        // Días del mes anterior
+        for (let i = firstDayIndex; i > 0; i--) {
+            calendarHTML += `<div style="min-height: 100px; padding: 8px; background: #f9fafb; border-radius: 8px; opacity: 0.5;">
+                <div style="font-size: 14px; color: #9ca3af; font-weight: 500;">${prevLastDayDate - i + 1}</div>
+            </div>`;
+        }
+        
+        // Días del mes actual
+        const today = new Date();
+        for (let day = 1; day <= lastDayDate; day++) {
+            const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+            
+            // Buscar asignaciones para este día
+            const dayAssignments = asignaciones.filter(a => {
+                const inicio = new Date(a.asig_fecha_inicio || a.fecha_inicio);
+                const fin = new Date(a.asig_fecha_fin || a.fecha_fin);
+                const currentDay = new Date(currentYear, currentMonth, day);
+                return currentDay >= inicio && currentDay <= fin;
+            });
+            
+            let dayStyle = 'min-height: 100px; padding: 8px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; transition: all 0.2s;';
+            if (isToday) {
+                dayStyle = 'min-height: 100px; padding: 8px; background: #E8F5E8; border: 2px solid #39A900; border-radius: 8px; transition: all 0.2s;';
+            }
+            
+            calendarHTML += `<div style="${dayStyle}" class="calendar-day" data-date="${dateStr}" onclick="verAsignacionesDia('${dateStr}', ${JSON.stringify(dayAssignments).replace(/"/g, '&quot;')})">
+                <div style="font-size: 14px; color: ${isToday ? '#39A900' : '#1f2937'}; font-weight: ${isToday ? '700' : '500'}; margin-bottom: 4px;">${day}</div>`;
+            
+            // Mostrar asignaciones
+            if (dayAssignments.length > 0) {
+                dayAssignments.slice(0, 2).forEach(asig => {
+                    calendarHTML += `<div style="background: #39A900; color: white; padding: 4px 6px; border-radius: 4px; font-size: 10px; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" title="${asig.instructor_nombre} - Ficha ${asig.ficha_numero}" onclick="event.stopPropagation(); verDetalleAsignacion(${asig.asig_id || asig.ASIG_ID || asig.id})">
+                        📚 ${asig.ficha_numero}
+                    </div>`;
+                });
+                if (dayAssignments.length > 2) {
+                    calendarHTML += `<div style="font-size: 10px; color: #6b7280; margin-top: 2px;">+${dayAssignments.length - 2} más</div>`;
+                }
+            }
+            
+            calendarHTML += '</div>';
+        }
+        
+        // Días del siguiente mes
+        const remainingDays = 7 - ((firstDayIndex + lastDayDate) % 7);
+        if (remainingDays < 7) {
+            for (let i = 1; i <= remainingDays; i++) {
+                calendarHTML += `<div style="min-height: 100px; padding: 8px; background: #f9fafb; border-radius: 8px; opacity: 0.5;">
+                    <div style="font-size: 14px; color: #9ca3af; font-weight: 500;">${i}</div>
+                </div>`;
+            }
+        }
+        
+        calendarHTML += '</div>';
+        document.getElementById('calendar').innerHTML = calendarHTML;
+        
+        // Hover effect en días
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            day.addEventListener('mouseenter', function() {
+                if (!this.style.background.includes('#E8F5E8')) {
+                    this.style.background = '#f9fafb';
+                    this.style.transform = 'scale(1.02)';
+                }
+            });
+            day.addEventListener('mouseleave', function() {
+                if (!this.style.background.includes('#E8F5E8')) {
+                    this.style.background = 'white';
+                    this.style.transform = 'scale(1)';
+                }
+            });
+        });
+        
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+    
+    // Event listeners para navegación
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('prevMonth')?.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+        
+        document.getElementById('nextMonth')?.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+        
+        document.getElementById('todayBtn')?.addEventListener('click', () => {
+            const today = new Date();
+            currentMonth = today.getMonth();
+            currentYear = today.getFullYear();
+            renderCalendar();
+        });
+    });
+    
+    // Initialize calendar
     function initCalendar() {
-        const calendarEl = document.getElementById('calendar');
-        const events = [
-            <?php foreach ($registros as $registro): ?>
-            {
-                title: '<?php echo addslashes(($registro['ficha_numero'] ?? '') . " - " . ($registro['instructor_nombre'] ?? '')); ?>',
-                start: '<?php echo $registro['asig_fecha_inicio'] ?? $registro['fecha_inicio'] ?? ''; ?>',
-                end: '<?php echo isset($registro['asig_fecha_fin']) ? date('Y-m-d', strtotime($registro['asig_fecha_fin'] . ' +1 day')) : (isset($registro['fecha_fin']) ? date('Y-m-d', strtotime($registro['fecha_fin'] . ' +1 day')) : ''); ?>',
-                backgroundColor: '<?php 
-                    $hoy = date('Y-m-d');
-                    $fecha_inicio = $registro['asig_fecha_inicio'] ?? $registro['fecha_inicio'] ?? '';
-                    $fecha_fin = $registro['asig_fecha_fin'] ?? $registro['fecha_fin'] ?? '';
-                    if ($fecha_fin && $fecha_fin < $hoy) {
-                        echo "#DC2626";
-                    } elseif ($fecha_inicio && $fecha_inicio > $hoy) {
-                        echo "#D97706";
-                    } else {
-                        echo "#39A900";
-                    }
-                ?>',
-                borderColor: '<?php 
-                    $hoy = date('Y-m-d');
-                    $fecha_inicio = $registro['asig_fecha_inicio'] ?? $registro['fecha_inicio'] ?? '';
-                    $fecha_fin = $registro['asig_fecha_fin'] ?? $registro['fecha_fin'] ?? '';
-                    if ($fecha_fin && $fecha_fin < $hoy) {
-                        echo "#DC2626";
-                    } elseif ($fecha_inicio && $fecha_inicio > $hoy) {
-                        echo "#D97706";
-                    } else {
-                        echo "#39A900";
-                    }
-                ?>',
-                extendedProps: {
-                    ambiente: '<?php echo addslashes($registro['ambiente_nombre'] ?? ''); ?>',
-                    competencia: '<?php echo addslashes($registro['competencia_nombre'] ?? ''); ?>',
-                    id: <?php echo $registro['asig_id'] ?? $registro['ASIG_ID'] ?? 0; ?>
-                }
-            },
-            <?php endforeach; ?>
-        ];
+        renderCalendar();
+    }
 
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'es',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,listMonth'
-            },
-            buttonText: {
-                today: 'Hoy',
-                month: 'Mes',
-                week: 'Semana',
-                list: 'Agenda'
-            },
-            hiddenDays: [0],
-            businessHours: {
-                daysOfWeek: [1, 2, 3, 4, 5, 6],
-                startTime: '08:00',
-                endTime: '17:00'
-            },
-            events: events,
-            selectable: true,
-            selectMirror: true,
-            select: function(info) {
-                showCreateModal(info.startStr, info.endStr);
-                calendar.unselect();
-            },
-            dateClick: function(info) {
-                const dayOfWeek = new Date(info.dateStr).getDay();
-                if (dayOfWeek !== 0) {
-                    showCreateModal(info.dateStr, info.dateStr);
+    // Función para ver asignaciones de un día
+    function verAsignacionesDia(fecha, asignaciones) {
+        const fechaObj = new Date(fecha + 'T00:00:00');
+        const fechaFormateada = fechaObj.toLocaleDateString('es-ES', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        let asignacionesHTML = '';
+        if (asignaciones.length === 0) {
+            asignacionesHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: #6b7280;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">📅</div>
+                    <p style="margin: 0 0 16px; font-size: 16px;">No hay asignaciones para este día</p>
+                    <button onclick="document.getElementById('modalDia').remove(); abrirModalNuevaAsignacion()" class="btn btn-primary btn-sm">
+                        Crear Asignación
+                    </button>
+                </div>
+            `;
+        } else {
+            asignacionesHTML = asignaciones.map(asig => {
+                const asigId = asig.asig_id || asig.ASIG_ID || asig.id;
+                return `
+                <div style="background: white; border: 2px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px; transition: all 0.2s; cursor: pointer;" 
+                     onmouseover="this.style.borderColor='#39A900'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(57, 169, 0, 0.2)'" 
+                     onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+                     onclick="verDetalleAsignacion(${asigId})">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                        <div style="font-weight: 700; color: #1f2937; font-size: 16px;">📚 Ficha ${asig.ficha_numero}</div>
+                        <span style="background: #E8F5E8; color: #39A900; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600;">ACTIVA</span>
+                    </div>
+                    <div style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">
+                        <strong>Instructor:</strong> ${asig.instructor_nombre}
+                    </div>
+                    ${asig.ambiente_nombre ? `<div style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">
+                        <strong>Ambiente:</strong> ${asig.ambiente_nombre}
+                    </div>` : ''}
+                    ${asig.competencia_nombre ? `<div style="font-size: 14px; color: #6b7280;">
+                        <strong>Competencia:</strong> ${asig.competencia_nombre}
+                    </div>` : ''}
+                </div>
+            `}).join('');
+        }
+
+        const modal = `
+            <div id="modalDia" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px;" onclick="if(event.target.id==='modalDia') this.remove()">
+                <div style="background: white; border-radius: 12px; max-width: 600px; width: 100%; box-shadow: 0 25px 70px rgba(0,0,0,0.4); overflow: hidden; max-height: 90vh; overflow-y: auto;" onclick="event.stopPropagation()">
+                    
+                    <!-- Header -->
+                    <div style="background: linear-gradient(135deg, #39A900 0%, #007832 100%); padding: 24px; color: white;">
+                        <h3 style="font-size: 22px; font-weight: 700; margin: 0 0 4px;">Asignaciones del Día</h3>
+                        <p style="font-size: 14px; margin: 0; opacity: 0.95;">${fechaFormateada}</p>
+                    </div>
+
+                    <!-- Contenido -->
+                    <div style="padding: 24px;">
+                        ${asignacionesHTML}
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; gap: 12px;">
+                        <button onclick="document.getElementById('modalDia').remove()" class="btn btn-secondary">Cerrar</button>
+                        <button onclick="document.getElementById('modalDia').remove(); abrirModalNuevaAsignacion()" class="btn btn-primary">Nueva Asignación</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modal);
+    }
+
+    // Función para ver detalle de una asignación
+    function verDetalleAsignacion(id) {
+        fetch(`get_asignacion.php?id=${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
                 }
-            },
-            eventClick: function(info) {
-                const props = info.event.extendedProps;
-                const fichaNumero = info.event.title.split(' - ')[0];
-                const instructorNombre = info.event.title.split(' - ')[1];
-                
-                // Determinar estado
-                const hoy = new Date();
-                const inicio = info.event.start;
-                const fin = info.event.end;
-                let estado = 'ACTIVO';
-                let estadoTexto = 'Activa y Verificada';
-                
-                if (fin && fin < hoy) {
-                    estado = 'FINALIZADA';
-                    estadoTexto = 'Finalizada';
-                } else if (inicio > hoy) {
-                    estado = 'PENDIENTE';
-                    estadoTexto = 'Pendiente de Inicio';
-                }
-                
+
                 const modal = `
-                    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px;" onclick="this.remove()">
-                        <div style="background: white; border-radius: 12px; max-width: 700px; width: 100%; box-shadow: 0 25px 70px rgba(0,0,0,0.4); overflow: hidden; max-height: 90vh; overflow-y: auto;" onclick="event.stopPropagation()">
+                    <div id="modalDetalle" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px;" onclick="if(event.target.id==='modalDetalle') this.remove()">
+                        <div style="background: white; border-radius: 12px; max-width: 600px; width: 100%; box-shadow: 0 25px 70px rgba(0,0,0,0.4); overflow: hidden;" onclick="event.stopPropagation()">
                             
                             <!-- Header -->
-                            <div style="background: white; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5e7eb;">
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <div style="width: 32px; height: 32px; background: #39A900; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
-                                        <span style="font-size: 18px;">📋</span>
-                                    </div>
-                                    <h3 style="font-size: 18px; font-weight: 700; color: #1f2937; margin: 0;">Detalles de la Solicitud: ${fichaNumero}</h3>
-                                </div>
-                                <button onclick="this.closest('div[style*=fixed]').remove()" style="background: transparent; border: none; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 24px; line-height: 1;">×</button>
+                            <div style="background: linear-gradient(135deg, #39A900 0%, #007832 100%); padding: 24px; color: white;">
+                                <h3 style="font-size: 22px; font-weight: 700; margin: 0 0 4px;">Detalle de Asignación</h3>
+                                <p style="font-size: 14px; margin: 0; opacity: 0.95;">ID: ${data.id}</p>
                             </div>
 
                             <!-- Contenido -->
                             <div style="padding: 24px;">
-                                
-                                <!-- Sección: Información de la Ficha -->
-                                <div style="margin-bottom: 24px;">
-                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 8px 12px; background: white; border-left: 4px solid #39A900;">
-                                        <span style="font-size: 14px; font-weight: 700; color: #1f2937;">Información de la Ficha</span>
+                                <!-- Estado -->
+                                <div style="background: ${data.estado_bg}; border-left: 4px solid ${data.estado_color}; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                                    <div style="font-weight: 700; color: ${data.estado_color}; font-size: 16px; margin-bottom: 4px;">
+                                        ${data.estado === 'Activa' ? '✓' : data.estado === 'Pendiente' ? '⏳' : '✕'} ${data.estado}
                                     </div>
-                                    
-                                    <!-- Tabla de información -->
-                                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
-                                        <thead>
-                                            <tr style="background: #39A900;">
-                                                <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: white; text-transform: uppercase; border-right: 1px solid rgba(255,255,255,0.3);">CAMPO</th>
-                                                <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: white; text-transform: uppercase; border-right: 1px solid rgba(255,255,255,0.3);">VALOR</th>
-                                                <th style="padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 700; color: white; text-transform: uppercase; border-right: 1px solid rgba(255,255,255,0.3);">ESTADO</th>
-                                                <th style="padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 700; color: white; text-transform: uppercase;">VERIFICADO</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr style="background: white; border-bottom: 1px solid #e5e7eb;">
-                                                <td style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #374151;">ID Ficha</td>
-                                                <td style="padding: 12px 16px; font-size: 13px; color: #1f2937;">${props.id}</td>
-                                                <td style="padding: 12px 16px; text-align: center;">
-                                                    <span style="background: #E8F5E8; color: #39A900; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase;">${estado}</span>
-                                                </td>
-                                                <td style="padding: 12px 16px; text-align: center;">
-                                                    <span style="color: #39A900; font-size: 18px;">✓</span>
-                                                </td>
-                                            </tr>
-                                            <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                                                <td style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #374151;">ID Programa</td>
-                                                <td style="padding: 12px 16px; font-size: 13px; color: #1f2937;">${props.id}</td>
-                                                <td style="padding: 12px 16px; text-align: center;">
-                                                    <span style="background: #E8F5E8; color: #39A900; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase;">VÁLIDO</span>
-                                                </td>
-                                                <td style="padding: 12px 16px; text-align: center;">
-                                                    <span style="color: #39A900; font-size: 18px;">✓</span>
-                                                </td>
-                                            </tr>
-                                            <tr style="background: white; border-bottom: 1px solid #e5e7eb;">
-                                                <td style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #374151;">Jornada</td>
-                                                <td style="padding: 12px 16px; font-size: 13px; color: #1f2937;">Mañana</td>
-                                                <td style="padding: 12px 16px; text-align: center;">
-                                                    <span style="background: #E8F5E8; color: #39A900; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase;">VÁLIDO</span>
-                                                </td>
-                                                <td style="padding: 12px 16px; text-align: center;">
-                                                    <span style="color: #39A900; font-size: 18px;">✓</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Información adicional -->
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-                                    <div style="background: white; padding: 16px; border-radius: 8px; border: 2px solid #e5e7eb;">
-                                        <div style="font-size: 11px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">ID INSTRUCTOR-LÍDER</div>
-                                        <div style="font-size: 16px; font-weight: 700; color: #1f2937;">${props.id}</div>
-                                    </div>
-                                    <div style="background: white; padding: 16px; border-radius: 8px; border: 2px solid #e5e7eb;">
-                                        <div style="font-size: 11px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">ESTADO DE LA FICHA</div>
-                                        <div style="font-size: 16px; font-weight: 700; color: #1f2937;">${estadoTexto}</div>
+                                    <div style="font-size: 13px; color: #6b7280;">
+                                        ${data.fecha_inicio_formatted} - ${data.fecha_fin_formatted}
                                     </div>
                                 </div>
 
-                                <!-- Botones de acción -->
-                                <div style="display: flex; gap: 12px;">
-                                    <a href="editar.php?id=${props.id}" style="flex: 1; padding: 12px; background: #3b82f6; color: white; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
-                                        Editar
-                                    </a>
-                                    <button onclick="if(confirm('¿Está seguro de eliminar esta asignación?')) window.location.href='index.php?eliminar=${props.id}'" style="flex: 1; padding: 12px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
-                                        Eliminar
-                                    </button>
+                                <!-- Información -->
+                                <div style="display: grid; gap: 16px;">
+                                    <div style="border-bottom: 1px solid #e5e7eb; padding-bottom: 12px;">
+                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; font-weight: 600;">Ficha</div>
+                                        <div style="font-size: 18px; font-weight: 700; color: #ec4899;">${data.ficha_numero}</div>
+                                    </div>
+
+                                    <div style="border-bottom: 1px solid #e5e7eb; padding-bottom: 12px;">
+                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; font-weight: 600;">Instructor</div>
+                                        <div style="font-size: 16px; font-weight: 600; color: #1f2937;">${data.instructor_nombre}</div>
+                                    </div>
+
+                                    ${data.ambiente_nombre !== 'No disponible' ? `
+                                    <div style="border-bottom: 1px solid #e5e7eb; padding-bottom: 12px;">
+                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; font-weight: 600;">Ambiente</div>
+                                        <div style="font-size: 16px; font-weight: 600; color: #1f2937;">${data.ambiente_nombre}</div>
+                                    </div>
+                                    ` : ''}
+
+                                    ${data.competencia_nombre !== 'No disponible' ? `
+                                    <div style="border-bottom: 1px solid #e5e7eb; padding-bottom: 12px;">
+                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; font-weight: 600;">Competencia</div>
+                                        <div style="font-size: 16px; font-weight: 600; color: #1f2937;">${data.competencia_nombre}</div>
+                                    </div>
+                                    ` : ''}
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                        <div>
+                                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; font-weight: 600;">Hora Inicio</div>
+                                            <div style="font-size: 16px; font-weight: 600; color: #1f2937;">⏰ ${data.hora_inicio}</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px; text-transform: uppercase; font-weight: 600;">Hora Fin</div>
+                                            <div style="font-size: 16px; font-weight: 600; color: #1f2937;">⏰ ${data.hora_fin}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; gap: 12px;">
+                                <button onclick="document.getElementById('modalDetalle').remove()" class="btn btn-secondary">Cerrar</button>
+                                <div style="display: flex; gap: 8px;">
+                                    <a href="ver.php?id=${data.id}" class="btn btn-secondary btn-sm">Ver Completo</a>
+                                    <a href="editar.php?id=${data.id}" class="btn btn-primary btn-sm">Editar</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
                 document.body.insertAdjacentHTML('beforeend', modal);
-            },
-            height: 'auto',
-            eventTimeFormat: {
-                hour: '2-digit',
-                minute: '2-digit',
-                meridiem: false
-            },
-            dayMaxEvents: 3,
-            eventDisplay: 'block',
-            displayEventTime: false
-        });
-
-        calendar.render();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cargar los detalles de la asignación');
+            });
     }
 
     // Show create modal
@@ -697,100 +815,6 @@ include __DIR__ . '/../layout/sidebar.php';
 
 </script>
 
-<!-- FullCalendar CSS -->
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
-
-<style>
-/* Estilos personalizados para eventos del calendario */
-.fc-event {
-    border-radius: 4px !important;
-    padding: 2px 6px !important;
-    font-size: 11px !important;
-    font-weight: 500 !important;
-    border: none !important;
-    margin-bottom: 1px !important;
-    cursor: pointer !important;
-}
-
-.fc-event-title {
-    font-weight: 600 !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-}
-
-.fc-daygrid-event {
-    padding: 2px 4px !important;
-    margin: 1px !important;
-}
-
-.fc-event-time {
-    display: none !important;
-}
-
-/* Mejorar el aspecto general del calendario */
-.fc-theme-standard td, .fc-theme-standard th {
-    border-color: #e5e7eb !important;
-}
-
-.fc-col-header-cell {
-    background: #f9fafb !important;
-    font-weight: 600 !important;
-    color: #6b7280 !important;
-    text-transform: uppercase !important;
-    font-size: 11px !important;
-    padding: 12px 8px !important;
-}
-
-.fc-daygrid-day-number {
-    color: #1f2937 !important;
-    font-weight: 600 !important;
-    padding: 8px !important;
-    font-size: 14px !important;
-}
-
-.fc-day-today {
-    background: #f0f9ff !important;
-}
-
-.fc-button {
-    background: #39A900 !important;
-    border-color: #39A900 !important;
-    text-transform: capitalize !important;
-    font-weight: 600 !important;
-    padding: 8px 16px !important;
-    border-radius: 8px !important;
-}
-
-.fc-button:hover {
-    background: #2d8700 !important;
-    border-color: #2d8700 !important;
-}
-
-.fc-button-active {
-    background: #2d8700 !important;
-    border-color: #2d8700 !important;
-}
-
-.fc-toolbar-title {
-    font-size: 20px !important;
-    font-weight: 700 !important;
-    color: #1f2937 !important;
-}
-
-.fc-daygrid-day-events {
-    margin-top: 2px !important;
-}
-
-.fc-daygrid-event-harness {
-    margin-bottom: 1px !important;
-}
-</style>
-
-<!-- FullCalendar JS -->
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales/es.global.min.js'></script>
-
 <script>
 // Función para abrir modal de nueva asignación
 function abrirModalNuevaAsignacion(fichaIdPreseleccionada = null) {
@@ -883,273 +907,6 @@ function abrirModalNuevaAsignacion(fichaIdPreseleccionada = null) {
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                    </div>
-
-                    <!-- Botones -->
-                    <div style="display: flex; gap: 12px;">
-                        <button type="button" onclick="cerrarModal()" style="flex: 1; padding: 14px; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">
-                            Cancelar
-                        </button>
-                        <button type="submit" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #39A900 0%, #007832 100%); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(57, 169, 0, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(57, 169, 0, 0.3)'">
-                            Guardar
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modal);
-}
-
-function cerrarModal() {
-    const modal = document.getElementById('modalNuevaAsignacion');
-    if (modal) {
-        modal.remove();
-    }
-}
-</script>
-                
-                <!-- Header Verde -->
-                <div style="background: linear-gradient(135deg, #39A900 0%, #007832 100%); padding: 24px; color: white;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                            <span style="font-size: 20px;">📅</span>
-                        </div>
-                        <div>
-                            <h3 style="font-size: 22px; font-weight: 700; margin: 0 0 4px;">Agregar Evento</h3>
-                            <p style="font-size: 14px; margin: 0; opacity: 0.95;">${fechaFormateada}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Formulario -->
-                <form method="POST" action="" style="padding: 24px;">
-                    <input type="hidden" name="crear_asignacion" value="1">
-                    <input type="hidden" name="ficha_id" value="${fichaId}">
-                    
-                    <!-- Sección: Información del Evento -->
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 3px solid #39A900;">
-                            <span style="font-size: 14px; font-weight: 700; color: #1f2937;">Información del Evento</span>
-                        </div>
-                        
-                        <!-- Tabla de información -->
-                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
-                            <thead>
-                                <tr style="background: #39A900;">
-                                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: white; text-transform: uppercase; width: 25%;">CAMPO</th>
-                                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: white; text-transform: uppercase; width: 40%;">VALOR</th>
-                                    <th style="padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 700; color: white; text-transform: uppercase; width: 20%;">ESTADO</th>
-                                    <th style="padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 700; color: white; text-transform: uppercase; width: 15%;">VERIFICADO</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Ficha (siempre predeterminada) -->
-                                <tr style="background: #E8F5E8; border-bottom: 1px solid #e5e7eb;">
-                                    <td style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #374151;">Ficha</td>
-                                    <td style="padding: 12px 16px;">
-                                        <div style="padding: 8px 12px; background: white; border: 2px solid #39A900; border-radius: 6px; font-size: 14px; font-weight: 600; color: #39A900;">
-                                            Ficha ${fichaId}
-                                        </div>
-                                    </td>
-                                    <td style="padding: 12px 16px; text-align: center;">
-                                        <span style="background: #E8F5E8; color: #39A900; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase;">ASIGNADA</span>
-                                    </td>
-                                    <td style="padding: 12px 16px; text-align: center;">
-                                        <span style="color: #39A900; font-size: 18px;">✓</span>
-                                    </td>
-                                </tr>
-                                
-                                <!-- Instructor -->
-                                <tr style="background: white; border-bottom: 1px solid #e5e7eb;">
-                                    <td style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #374151;">Instructor</td>
-                                    <td style="padding: 12px 16px;">
-                                        <select name="instructor_id" required style="width: 100%; padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px; background: white; color: #1f2937;">
-                                            <option value="">Seleccionar...</option>
-                                            <?php foreach ($instructores as $instructor): ?>
-                                                <option value="<?php echo htmlspecialchars($instructor['inst_id'] ?? ''); ?>">
-                                                    <?php echo htmlspecialchars(($instructor['inst_nombres'] ?? '') . ' ' . ($instructor['inst_apellidos'] ?? '')); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </td>
-                                    <td style="padding: 12px 16px; text-align: center;">
-                                        <span style="background: #FEF3C7; color: #D97706; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase;">PENDIENTE</span>
-                                    </td>
-                                    <td style="padding: 12px 16px; text-align: center;">
-                                        <span style="color: #D97706; font-size: 18px;">⏳</span>
-                                    </td>
-                                </tr>
-                                
-                                <!-- Ambiente -->
-                                <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                                    <td style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #374151;">Ambiente</td>
-                                    <td style="padding: 12px 16px;">
-                                        <select name="ambiente_id" style="width: 100%; padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px; background: white; color: #1f2937;">
-                                            <option value="">Seleccionar...</option>
-                                            <?php foreach ($ambientes as $ambiente): ?>
-                                                <option value="<?php echo htmlspecialchars($ambiente['amb_id'] ?? ''); ?>">
-                                                    <?php echo htmlspecialchars($ambiente['amb_nombre'] ?? ''); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </td>
-                                    <td style="padding: 12px 16px; text-align: center;">
-                                        <span style="background: #FEF3C7; color: #D97706; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase;">PENDIENTE</span>
-                                    </td>
-                                    <td style="padding: 12px 16px; text-align: center;">
-                                        <span style="color: #D97706; font-size: 18px;">⏳</span>
-                                    </td>
-                                </tr>
-                                
-                                <!-- Competencia -->
-                                <tr style="background: white; border-bottom: 1px solid #e5e7eb;">
-                                    <td style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #374151;">Competencia</td>
-                                    <td style="padding: 12px 16px;">
-                                        <select name="competencia_id" style="width: 100%; padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px; background: white; color: #1f2937;">
-                                            <option value="">Seleccionar...</option>
-                                            <?php foreach ($competencias as $competencia): ?>
-                                                <option value="<?php echo htmlspecialchars($competencia['comp_id'] ?? ''); ?>">
-                                                    <?php echo htmlspecialchars($competencia['comp_nombre_corto'] ?? ''); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </td>
-                                    <td style="padding: 12px 16px; text-align: center;">
-                                        <span style="background: #F3F4F6; color: #6B7280; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase;">OPCIONAL</span>
-                                    </td>
-                                    <td style="padding: 12px 16px; text-align: center;">
-                                        <span style="color: #6B7280; font-size: 18px;">-</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Días de la semana -->
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 12px;">Días de la semana</label>
-                        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;">
-                            <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border: 2px solid #39A900; background: #E8F5E8; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #39A900;">
-                                <input type="checkbox" name="dias[]" value="1" checked style="width: 16px; height: 16px;">
-                                Lun
-                            </label>
-                            <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border: 2px solid #39A900; background: #E8F5E8; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #39A900;">
-                                <input type="checkbox" name="dias[]" value="2" checked style="width: 16px; height: 16px;">
-                                Mar
-                            </label>
-                            <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border: 2px solid #39A900; background: #E8F5E8; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #39A900;">
-                                <input type="checkbox" name="dias[]" value="3" checked style="width: 16px; height: 16px;">
-                                Mié
-                            </label>
-                            <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border: 2px solid #39A900; background: #E8F5E8; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #39A900;">
-                                <input type="checkbox" name="dias[]" value="4" checked style="width: 16px; height: 16px;">
-                                Jue
-                            </label>
-                            <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border: 2px solid #39A900; background: #E8F5E8; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #39A900;">
-                                <input type="checkbox" name="dias[]" value="5" checked style="width: 16px; height: 16px;">
-                                Vie
-                            </label>
-                            <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border: 2px solid #e5e7eb; background: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #6b7280;">
-                                <input type="checkbox" name="dias[]" value="6" style="width: 16px; height: 16px;">
-                                Sáb
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Rango de fechas y horas -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-                        <div>
-                            <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Rango de Fechas</label>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <input type="date" name="fecha_inicio" value="${hoy}" required style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px;">
-                                <span style="color: #6b7280;">-</span>
-                                <input type="date" name="fecha_fin" value="${hoy}" required style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px;">
-                            </div>
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Rango de Horas</label>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <input type="time" name="hora_inicio" value="08:00" required style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px;">
-                                <span style="color: #6b7280;">-</span>
-                                <input type="time" name="hora_fin" value="17:00" required style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px;">
-                            </div>
-                            <p style="font-size: 11px; color: #6b7280; margin: 6px 0 0; font-style: italic;">Horario: 6:00 AM - 10:00 PM</p>
-                        </div>
-                    </div>
-
-                    <!-- Botones de acción -->
-                    <div style="display: flex; gap: 12px; padding-top: 8px; border-top: 1px solid #e5e7eb;">
-                        <button type="button" onclick="cerrarModal()" style="flex: 1; padding: 14px; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">
-                            Cancelar
-                        </button>
-                        <button type="submit" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #39A900 0%, #007832 100%); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(57, 169, 0, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(57, 169, 0, 0.3)'">
-                            Guardar
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modal);
-    
-    // Agregar efecto hover a los checkboxes de días
-    document.querySelectorAll('#modalNuevaAsignacion label:has(input[type="checkbox"])').forEach(label => {
-        const checkbox = label.querySelector('input[type="checkbox"]');
-        checkbox.addEventListener('change', function() {
-            if (this.checked) {
-                label.style.borderColor = '#39A900';
-                label.style.background = '#E8F5E8';
-                label.style.color = '#39A900';
-            } else {
-                label.style.borderColor = '#e5e7eb';
-                label.style.background = 'white';
-                label.style.color = '#6b7280';
-            }
-        });
-    });
-}
-
-function cerrarModal() {
-    const modal = document.getElementById('modalNuevaAsignacion');
-    if (modal) {
-        modal.remove();
-    }
-}
-                            <label style="display: flex; align-items: center; gap: 6px; padding: 10px; border: 2px solid #39A900; background: #E8F5E8; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #39A900;">
-                                <input type="checkbox" name="dias[]" value="4" checked style="width: 16px; height: 16px;">
-                                Jue
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 6px; padding: 10px; border: 2px solid #39A900; background: #E8F5E8; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #39A900;">
-                                <input type="checkbox" name="dias[]" value="5" checked style="width: 16px; height: 16px;">
-                                Vie
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 6px; padding: 10px; border: 2px solid #e5e7eb; background: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #6b7280;">
-                                <input type="checkbox" name="dias[]" value="6" style="width: 16px; height: 16px;">
-                                Sáb
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Rango de fechas y horas -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-                        <div>
-                            <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Rango de Fechas</label>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <input type="date" name="fecha_inicio" value="${hoy}" required style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px;">
-                                <span style="color: #6b7280;">-</span>
-                                <input type="date" name="fecha_fin" value="${hoy}" required style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px;">
-                            </div>
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Rango de Horas</label>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <input type="time" name="hora_inicio" value="06:00" required style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px;">
-                                <span style="color: #6b7280;">-</span>
-                                <input type="time" name="hora_fin" value="22:00" required style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px;">
-                            </div>
-                            <p style="font-size: 11px; color: #6b7280; margin: 6px 0 0; font-style: italic;">Horario: 6:00 AM - 10:00 PM</p>
-                        </div>
                     </div>
 
                     <!-- Botones -->

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../auth/check_auth.php';
 require_once __DIR__ . '/../../model/AmbienteModel.php';
 require_once __DIR__ . '/../../model/SedeModel.php';
 
@@ -6,8 +7,21 @@ $model = new AmbienteModel();
 $sedeModel = new SedeModel();
 $sedes = $sedeModel->getAll();
 
-$id = $_GET['id'];
+$id = safe($_GET, 'id', 0);
+
+if (!$id) {
+    header('Location: index.php');
+    exit;
+}
+
 $registro = $model->getById($id);
+
+// Verificar si el registro existe
+if (!registroValido($registro)) {
+    $_SESSION['error'] = 'Ambiente no encontrado';
+    header('Location: index.php');
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $model->update($id, $_POST);
@@ -26,27 +40,28 @@ include __DIR__ . '/../layout/sidebar.php';
         <form method="POST">
             <div class="form-group">
                 <label>Código *</label>
-                <input type="text" name="codigo" class="form-control" value="<?php echo $registro['codigo']; ?>" required>
+                <input type="text" name="codigo" class="form-control" value="<?php echo safeHtml($registro, 'amb_codigo'); ?>" required>
             </div>
             <div class="form-group">
                 <label>Nombre *</label>
-                <input type="text" name="nombre" class="form-control" value="<?php echo $registro['nombre']; ?>" required>
+                <input type="text" name="nombre" class="form-control" value="<?php echo safeHtml($registro, 'amb_nombre'); ?>" required>
             </div>
             <div class="form-group">
                 <label>Capacidad *</label>
-                <input type="number" name="capacidad" class="form-control" value="<?php echo $registro['capacidad']; ?>" required>
+                <input type="number" name="capacidad" class="form-control" value="<?php echo safeHtml($registro, 'amb_capacidad'); ?>" required>
             </div>
             <div class="form-group">
                 <label>Tipo *</label>
-                <input type="text" name="tipo" class="form-control" value="<?php echo $registro['tipo']; ?>" required>
+                <input type="text" name="tipo" class="form-control" value="<?php echo safeHtml($registro, 'amb_tipo'); ?>" required>
             </div>
             <div class="form-group">
                 <label>Sede</label>
                 <select name="sede_id" class="form-control">
                     <option value="">Seleccione...</option>
                     <?php foreach ($sedes as $sede): ?>
-                        <option value="<?php echo $sede['id']; ?>" <?php echo $registro['sede_id'] == $sede['id'] ? 'selected' : ''; ?>>
-                            <?php echo $sede['nombre']; ?>
+                        <option value="<?php echo safeHtml($sede, 'sede_id'); ?>" 
+                                <?php echo (safe($registro, 'SEDE_sede_id') == safe($sede, 'sede_id')) ? 'selected' : ''; ?>>
+                            <?php echo safeHtml($sede, 'sede_nombre'); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

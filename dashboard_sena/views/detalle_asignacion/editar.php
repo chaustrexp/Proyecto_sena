@@ -7,8 +7,21 @@ $model = new DetalleAsignacionModel();
 $asignacionModel = new AsignacionModel();
 $asignaciones = $asignacionModel->getAll();
 
-$id = $_GET['id'];
+$id = safe($_GET, 'id', 0);
+
+if (!$id) {
+    header('Location: index.php');
+    exit;
+}
+
 $registro = $model->getById($id);
+
+// Verificar si el registro existe
+if (!registroValido($registro)) {
+    $_SESSION['error'] = 'Detalle de Asignación no encontrado';
+    header('Location: index.php');
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $model->update($id, $_POST);
@@ -30,27 +43,32 @@ include __DIR__ . '/../layout/sidebar.php';
                 <select name="asignacion_id" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <?php foreach ($asignaciones as $asignacion): ?>
-                        <option value="<?php echo $asignacion['id']; ?>" <?php echo $registro['asignacion_id'] == $asignacion['id'] ? 'selected' : ''; ?>>
-                            ID: <?php echo $asignacion['id']; ?> - Ficha: <?php echo $asignacion['ficha_numero']; ?> - Instructor: <?php echo $asignacion['instructor_nombre']; ?>
+                        <option value="<?php echo safeHtml($asignacion, 'asig_id'); ?>" 
+                                <?php echo (safe($registro, 'ASIGNACION_asig_id') == safe($asignacion, 'asig_id')) ? 'selected' : ''; ?>>
+                            ID: <?php echo safeHtml($asignacion, 'asig_id'); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             </div>
+            
             <div class="form-group">
                 <label>Fecha *</label>
-                <input type="date" name="fecha" class="form-control" value="<?php echo $registro['fecha']; ?>" required>
+                <input type="date" name="fecha" class="form-control" value="<?php echo safeHtml($registro, 'detasig_fecha'); ?>" required>
             </div>
+            
             <div class="form-group">
                 <label>Hora Inicio *</label>
-                <input type="time" name="hora_inicio" class="form-control" value="<?php echo $registro['hora_inicio']; ?>" required>
+                <input type="time" name="hora_inicio" class="form-control" value="<?php echo safeHtml($registro, 'detasig_hora_inicio'); ?>" required>
             </div>
+            
             <div class="form-group">
                 <label>Hora Fin *</label>
-                <input type="time" name="hora_fin" class="form-control" value="<?php echo $registro['hora_fin']; ?>" required>
+                <input type="time" name="hora_fin" class="form-control" value="<?php echo safeHtml($registro, 'detasig_hora_fin'); ?>" required>
             </div>
+            
             <div class="form-group">
                 <label>Observaciones</label>
-                <textarea name="observaciones" class="form-control" rows="4"><?php echo $registro['observaciones']; ?></textarea>
+                <textarea name="observaciones" class="form-control" rows="4"><?php echo safeHtml($registro, 'detasig_observaciones'); ?></textarea>
             </div>
             <div class="btn-group">
                 <button type="submit" class="btn btn-primary">Actualizar</button>

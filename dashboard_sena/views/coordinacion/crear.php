@@ -48,8 +48,8 @@ include __DIR__ . '/../layout/sidebar.php';
                     <select name="CENTRO_FORMACION_cent_id" class="form-control" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
                         <option value="">Seleccione un centro...</option>
                         <?php foreach ($centros as $centro): ?>
-                            <option value="<?php echo $centro['cent_id']; ?>">
-                                <?php echo htmlspecialchars($centro['cent_nombre']); ?>
+                            <option value="<?php echo safeHtml($centro, 'cent_id'); ?>">
+                                <?php echo safeHtml($centro, 'cent_nombre'); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../auth/check_auth.php';
 require_once __DIR__ . '/../../model/AmbienteModel.php';
 require_once __DIR__ . '/../../model/SedeModel.php';
 
@@ -35,7 +36,7 @@ include __DIR__ . '/../layout/sidebar.php';
                 <select name="SEDE_sede_id" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <?php foreach ($sedes as $sede): ?>
-                        <option value="<?php echo $sede['sede_id']; ?>"><?php echo htmlspecialchars($sede['sede_nombre']); ?></option>
+                        <option value="<?php echo safeHtml($sede, 'sede_id'); ?>"><?php echo safeHtml($sede, 'sede_nombre'); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>

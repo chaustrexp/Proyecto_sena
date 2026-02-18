@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../auth/check_auth.php';
 require_once __DIR__ . '/../../model/AsignacionModel.php';
 require_once __DIR__ . '/../../model/FichaModel.php';
 require_once __DIR__ . '/../../model/InstructorModel.php';
@@ -68,7 +69,7 @@ include __DIR__ . '/../layout/sidebar.php';
                 <select name="ficha_id" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <?php foreach ($fichas as $ficha): ?>
-                        <option value="<?php echo htmlspecialchars($ficha['fich_id'] ?? ''); ?>"><?php echo htmlspecialchars($ficha['fich_id'] ?? ''); ?></option>
+                        <option value="<?php echo safeHtml($ficha, 'fich_id'); ?>"><?php echo safeHtml($ficha, 'fich_id'); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -78,8 +79,8 @@ include __DIR__ . '/../layout/sidebar.php';
                 <select name="instructor_id" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <?php foreach ($instructores as $instructor): ?>
-                        <option value="<?php echo htmlspecialchars($instructor['inst_id'] ?? ''); ?>">
-                            <?php echo htmlspecialchars(($instructor['inst_nombres'] ?? '') . ' ' . ($instructor['inst_apellidos'] ?? '')); ?>
+                        <option value="<?php echo safeHtml($instructor, 'inst_id'); ?>">
+                            <?php echo safeHtml($instructor, 'inst_nombres') . ' ' . safeHtml($instructor, 'inst_apellidos'); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -90,7 +91,7 @@ include __DIR__ . '/../layout/sidebar.php';
                 <select name="ambiente_id" class="form-control">
                     <option value="">Seleccione...</option>
                     <?php foreach ($ambientes as $ambiente): ?>
-                        <option value="<?php echo htmlspecialchars($ambiente['amb_id'] ?? ''); ?>"><?php echo htmlspecialchars($ambiente['amb_nombre'] ?? ''); ?></option>
+                        <option value="<?php echo safeHtml($ambiente, 'amb_id'); ?>"><?php echo safeHtml($ambiente, 'amb_nombre'); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -100,7 +101,7 @@ include __DIR__ . '/../layout/sidebar.php';
                 <select name="competencia_id" class="form-control">
                     <option value="">Seleccione...</option>
                     <?php foreach ($competencias as $competencia): ?>
-                        <option value="<?php echo htmlspecialchars($competencia['comp_id'] ?? ''); ?>"><?php echo htmlspecialchars($competencia['comp_nombre_corto'] ?? ''); ?></option>
+                        <option value="<?php echo safeHtml($competencia, 'comp_id'); ?>"><?php echo safeHtml($competencia, 'comp_nombre_corto'); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>

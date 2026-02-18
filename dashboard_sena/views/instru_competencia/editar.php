@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../auth/check_auth.php';
 require_once __DIR__ . '/../../model/InstruCompetenciaModel.php';
 require_once __DIR__ . '/../../model/InstructorModel.php';
 require_once __DIR__ . '/../../model/ProgramaModel.php';
@@ -9,14 +10,18 @@ $instructorModel = new InstructorModel();
 $programaModel = new ProgramaModel();
 $competenciaModel = new CompetenciaModel();
 
-$id = $_GET['id'] ?? null;
+$id = safe($_GET, 'id', 0);
+
 if (!$id) {
     header('Location: index.php');
     exit;
 }
 
 $registro = $model->getById($id);
-if (!$registro) {
+
+// Verificar si el registro existe
+if (!registroValido($registro)) {
+    $_SESSION['error'] = 'Competencia de Instructor no encontrada';
     header('Location: index.php');
     exit;
 }
@@ -45,9 +50,9 @@ include __DIR__ . '/../layout/sidebar.php';
                 <select name="INSTRUCTOR_inst_id" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <?php foreach ($instructores as $instructor): ?>
-                        <option value="<?php echo $instructor['inst_id']; ?>" 
-                            <?php echo ($instructor['inst_id'] == $registro['INSTRUCTOR_inst_id']) ? 'selected' : ''; ?>>
-                            <?php echo $instructor['inst_nombres'] . ' ' . $instructor['inst_apellidos']; ?>
+                        <option value="<?php echo safeHtml($instructor, 'inst_id'); ?>" 
+                            <?php echo (safe($registro, 'INSTRUCTOR_inst_id') == safe($instructor, 'inst_id')) ? 'selected' : ''; ?>>
+                            <?php echo safeHtml($instructor, 'inst_nombres') . ' ' . safeHtml($instructor, 'inst_apellidos'); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -58,9 +63,9 @@ include __DIR__ . '/../layout/sidebar.php';
                 <select name="COMPETxPROGRAMA_PROGRAMA_prog_id" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <?php foreach ($programas as $programa): ?>
-                        <option value="<?php echo $programa['prog_codigo']; ?>"
-                            <?php echo ($programa['prog_codigo'] == $registro['COMPETxPROGRAMA_PROGRAMA_prog_id']) ? 'selected' : ''; ?>>
-                            <?php echo $programa['prog_denominacion']; ?>
+                        <option value="<?php echo safeHtml($programa, 'prog_codigo'); ?>"
+                            <?php echo (safe($registro, 'COMPETxPROGRAMA_PROGRAMA_prog_id') == safe($programa, 'prog_codigo')) ? 'selected' : ''; ?>>
+                            <?php echo safeHtml($programa, 'prog_denominacion'); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -71,9 +76,9 @@ include __DIR__ . '/../layout/sidebar.php';
                 <select name="COMPETxPROGRAMA_COMPETENCIA_comp_id" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <?php foreach ($competencias as $competencia): ?>
-                        <option value="<?php echo $competencia['comp_id']; ?>"
-                            <?php echo ($competencia['comp_id'] == $registro['COMPETxPROGRAMA_COMPETENCIA_comp_id']) ? 'selected' : ''; ?>>
-                            <?php echo $competencia['comp_nombre_corto'] . ' - ' . $competencia['comp_nombre_unidad_competencia']; ?>
+                        <option value="<?php echo safeHtml($competencia, 'comp_id'); ?>"
+                            <?php echo (safe($registro, 'COMPETxPROGRAMA_COMPETENCIA_comp_id') == safe($competencia, 'comp_id')) ? 'selected' : ''; ?>>
+                            <?php echo safeHtml($competencia, 'comp_nombre_corto') . ' - ' . safeHtml($competencia, 'comp_nombre_unidad_competencia'); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -82,7 +87,7 @@ include __DIR__ . '/../layout/sidebar.php';
             <div class="form-group">
                 <label>Fecha de Vigencia *</label>
                 <input type="date" name="inscomp_vigencia" class="form-control" 
-                    value="<?php echo $registro['inscomp_vigencia']; ?>" required>
+                    value="<?php echo safeHtml($registro, 'inscomp_vigencia'); ?>" required>
                 <small style="color: #6b7280; font-size: 12px; margin-top: 4px; display: block;">
                     Fecha hasta la cual el instructor está certificado para impartir esta competencia
                 </small>

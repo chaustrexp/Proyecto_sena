@@ -1,27 +1,82 @@
 <?php
+require_once __DIR__ . '/../../auth/check_auth.php';
 require_once __DIR__ . '/../../model/InstructorModel.php';
 require_once __DIR__ . '/../../model/CentroFormacionModel.php';
+
 $model = new InstructorModel();
 $centroModel = new CentroFormacionModel();
 $centros = $centroModel->getAll();
-$id = $_GET['id'];
+
+$id = safe($_GET, 'id', 0);
+
+if (!$id) {
+    header('Location: index.php');
+    exit;
+}
+
 $registro = $model->getById($id);
-if ($_SERVER['REQUEST_METHOD'] === 'POST') { $model->update($id, $_POST); header('Location: index.php?msg=actualizado'); exit; }
+
+// Verificar si el registro existe
+if (!registroValido($registro)) {
+    $_SESSION['error'] = 'Instructor no encontrado';
+    header('Location: index.php');
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $model->update($id, $_POST);
+    header('Location: index.php?msg=actualizado');
+    exit;
+}
+
 $pageTitle = "Editar Instructor";
 include __DIR__ . '/../layout/header.php';
 include __DIR__ . '/../layout/sidebar.php';
 ?>
+
 <div class="main-content">
     <div class="form-container">
         <h2>Editar Instructor</h2>
         <form method="POST">
-            <div class="form-group"><label>Nombre *</label><input type="text" name="nombre" class="form-control" value="<?php echo $registro['nombre']; ?>" required></div>
-            <div class="form-group"><label>Documento *</label><input type="text" name="documento" class="form-control" value="<?php echo $registro['documento']; ?>" required></div>
-            <div class="form-group"><label>Email</label><input type="email" name="email" class="form-control" value="<?php echo $registro['email']; ?>"></div>
-            <div class="form-group"><label>Teléfono</label><input type="text" name="telefono" class="form-control" value="<?php echo $registro['telefono']; ?>"></div>
-            <div class="form-group"><label>Centro Formación</label><select name="centro_formacion_id" class="form-control"><option value="">Seleccione...</option><?php foreach ($centros as $centro): ?><option value="<?php echo $centro['id']; ?>" <?php echo $registro['centro_formacion_id'] == $centro['id'] ? 'selected' : ''; ?>><?php echo $centro['nombre']; ?></option><?php endforeach; ?></select></div>
-            <div class="btn-group"><button type="submit" class="btn btn-primary">Actualizar</button><a href="index.php" class="btn btn-secondary">Cancelar</a></div>
+            <div class="form-group">
+                <label>Nombres *</label>
+                <input type="text" name="nombres" class="form-control" value="<?php echo safeHtml($registro, 'inst_nombres'); ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Apellidos *</label>
+                <input type="text" name="apellidos" class="form-control" value="<?php echo safeHtml($registro, 'inst_apellidos'); ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Correo *</label>
+                <input type="email" name="correo" class="form-control" value="<?php echo safeHtml($registro, 'inst_correo'); ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" name="telefono" class="form-control" value="<?php echo safeHtml($registro, 'inst_telefono'); ?>">
+            </div>
+            
+            <div class="form-group">
+                <label>Centro de Formación *</label>
+                <select name="centro_id" class="form-control" required>
+                    <option value="">Seleccione...</option>
+                    <?php foreach ($centros as $centro): ?>
+                        <option value="<?php echo safeHtml($centro, 'cent_id'); ?>" 
+                                <?php echo (safe($registro, 'CENTROFORMACION_cent_id') == safe($centro, 'cent_id')) ? 'selected' : ''; ?>>
+                            <?php echo safeHtml($centro, 'cent_nombre'); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">Actualizar</button>
+                <a href="index.php" class="btn btn-secondary">Cancelar</a>
+            </div>
         </form>
     </div>
 </div>
+
 <?php include __DIR__ . '/../layout/footer.php'; ?>

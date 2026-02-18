@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../auth/check_auth.php';
 require_once __DIR__ . '/../../model/ProgramaModel.php';
 require_once __DIR__ . '/../../model/TituloProgramaModel.php';
 
@@ -46,7 +47,7 @@ include __DIR__ . '/../layout/sidebar.php';
                     <select name="TIT_PROGRAMA_titpro_id" class="form-control" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
                         <option value="">Seleccione un título...</option>
                         <?php foreach ($titulos as $titulo): ?>
-                            <option value="<?php echo $titulo['titpro_id']; ?>"><?php echo htmlspecialchars($titulo['titpro_nombre']); ?></option>
+                            <option value="<?php echo safeHtml($titulo, 'titpro_id'); ?>"><?php echo safeHtml($titulo, 'titpro_nombre'); ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>

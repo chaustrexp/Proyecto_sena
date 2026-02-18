@@ -1,16 +1,17 @@
 <?php
+require_once __DIR__ . '/../../auth/check_auth.php';
 require_once __DIR__ . '/../../model/InstruCompetenciaModel.php';
 
 $model = new InstruCompetenciaModel();
 
-$id = $_GET['id'] ?? null;
+$id = safe($_GET, 'id', 0);
 if (!$id) {
     header('Location: index.php');
     exit;
 }
 
 $registro = $model->getById($id);
-if (!$registro) {
+if (!registroValido($registro)) {
     header('Location: index.php');
     exit;
 }
@@ -20,7 +21,8 @@ include __DIR__ . '/../layout/header.php';
 include __DIR__ . '/../layout/sidebar.php';
 
 $hoy = date('Y-m-d');
-$vigente = $registro['inscomp_vigencia'] >= $hoy;
+$vigencia = safe($registro, 'inscomp_vigencia', $hoy);
+$vigente = $vigencia >= $hoy;
 ?>
 
 <div class="main-content">
@@ -30,7 +32,7 @@ $vigente = $registro['inscomp_vigencia'] >= $hoy;
             <p style="font-size: 14px; color: #6b7280; margin: 0;">Información completa de la competencia asignada</p>
         </div>
         <div class="btn-group">
-            <a href="editar.php?id=<?php echo $registro['inscomp_id']; ?>" class="btn btn-primary">
+            <a href="editar.php?id=<?php echo safeHtml($registro, 'inscomp_id'); ?>" class="btn btn-primary">
                 <i data-lucide="edit" style="width: 18px; height: 18px;"></i>
                 Editar
             </a>
@@ -53,10 +55,10 @@ $vigente = $registro['inscomp_vigencia'] >= $hoy;
                     <div style="font-size: 14px; color: #6b7280;">
                         <?php 
                         if ($vigente) {
-                            $dias = (strtotime($registro['inscomp_vigencia']) - strtotime($hoy)) / 86400;
+                            $dias = (strtotime($vigencia) - strtotime($hoy)) / 86400;
                             echo "Válida por " . ceil($dias) . " días más";
                         } else {
-                            $dias = (strtotime($hoy) - strtotime($registro['inscomp_vigencia'])) / 86400;
+                            $dias = (strtotime($hoy) - strtotime($vigencia)) / 86400;
                             echo "Vencida hace " . ceil($dias) . " días";
                         }
                         ?>
@@ -75,7 +77,7 @@ $vigente = $registro['inscomp_vigencia'] >= $hoy;
                     </div>
                     <div>
                         <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Instructor</div>
-                        <div style="font-size: 20px; font-weight: 700; color: #1f2937;"><?php echo $registro['instructor_nombre']; ?></div>
+                        <div style="font-size: 20px; font-weight: 700; color: #1f2937;"><?php echo safeHtml($registro, 'instructor_nombre'); ?></div>
                     </div>
                 </div>
             </div>
@@ -89,7 +91,7 @@ $vigente = $registro['inscomp_vigencia'] >= $hoy;
                     <div>
                         <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Vigencia</div>
                         <div style="font-size: 20px; font-weight: 700; color: #1f2937;">
-                            <?php echo date('d/m/Y', strtotime($registro['inscomp_vigencia'])); ?>
+                            <?php echo e(date('d/m/Y', strtotime($vigencia))); ?>
                         </div>
                     </div>
                 </div>
@@ -108,7 +110,7 @@ $vigente = $registro['inscomp_vigencia'] >= $hoy;
                         Programa
                     </div>
                     <div style="color: #1f2937; font-weight: 600; font-size: 15px;">
-                        <?php echo $registro['prog_denominacion']; ?>
+                        <?php echo safeHtml($registro, 'prog_denominacion'); ?>
                     </div>
                 </div>
 
@@ -118,7 +120,7 @@ $vigente = $registro['inscomp_vigencia'] >= $hoy;
                     </div>
                     <div style="color: #1f2937; font-weight: 600; font-size: 15px;">
                         <span style="background: #f3f4f6; padding: 4px 12px; border-radius: 6px; color: #8b5cf6; font-weight: 700;">
-                            <?php echo $registro['comp_nombre_corto']; ?>
+                            <?php echo safeHtml($registro, 'comp_nombre_corto'); ?>
                         </span>
                     </div>
                 </div>
@@ -128,7 +130,7 @@ $vigente = $registro['inscomp_vigencia'] >= $hoy;
                         Unidad de Competencia
                     </div>
                     <div style="color: #1f2937; font-weight: 500; font-size: 15px; line-height: 1.6;">
-                        <?php echo $registro['comp_nombre_unidad_competencia']; ?>
+                        <?php echo safeHtml($registro, 'comp_nombre_unidad_competencia'); ?>
                     </div>
                 </div>
             </div>
@@ -137,11 +139,11 @@ $vigente = $registro['inscomp_vigencia'] >= $hoy;
         <!-- Actions -->
         <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
             <div class="btn-group">
-                <a href="editar.php?id=<?php echo $registro['inscomp_id']; ?>" class="btn btn-primary">
+                <a href="editar.php?id=<?php echo safeHtml($registro, 'inscomp_id'); ?>" class="btn btn-primary">
                     <i data-lucide="edit" style="width: 18px; height: 18px;"></i>
                     Editar
                 </a>
-                <button onclick="confirmarEliminacion(<?php echo $registro['inscomp_id']; ?>, 'competencia de instructor')" class="btn btn-danger">
+                <button onclick="confirmarEliminacion(<?php echo safeHtml($registro, 'inscomp_id'); ?>, 'competencia de instructor')" class="btn btn-danger">
                     <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
                     Eliminar
                 </button>
