@@ -1,5 +1,25 @@
 # Changelog - Dashboard SENA
 
+## [1.2.1] - 2026-02-20
+
+### 🐛 Correcciones
+
+#### Tabla de Asignaciones
+- ✅ **Campo Programa**: Agregado JOIN con tabla PROGRAMA para mostrar nombre del programa
+- ✅ **Columna ID (Ficha)**: Muestra número de ficha con formato de 8 dígitos
+- ✅ **Columna Programa**: Muestra nombre completo del programa asociado a la ficha
+- ✅ Actualizado `AsignacionModel.php` con JOIN adicional: FICHA → PROGRAMA
+- ✅ Métodos actualizados: `getAll()`, `getById()`, `getRecent()`, `getForCalendar()`
+
+### 📁 Archivos Modificados
+- `model/AsignacionModel.php` - Agregado JOIN con PROGRAMA en todas las consultas
+
+### 📁 Archivos Nuevos
+- `_tests/test_programa_asignacion.php` - Script de verificación
+- `_docs/CORRECCION_PROGRAMA_ASIGNACION.md` - Documentación de la corrección
+
+---
+
 ## [1.2.0] - 2026-02-19
 
 ### 🎉 Nuevas Funcionalidades

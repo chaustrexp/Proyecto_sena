@@ -55,7 +55,7 @@ include __DIR__ . '/../layout/sidebar.php';
                     <?php foreach ($fichas as $ficha): ?>
                         <option value="<?php echo safeHtml($ficha, 'fich_id'); ?>" 
                                 <?php echo (safe($registro, 'FICHA_fich_id') == safe($ficha, 'fich_id')) ? 'selected' : ''; ?>>
-                            <?php echo safeHtml($ficha, 'fich_id'); ?>
+                            Ficha <?php echo str_pad(safeHtml($ficha, 'fich_numero'), 8, '0', STR_PAD_LEFT); ?> - <?php echo safeHtml($ficha, 'prog_denominacion'); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

@@ -144,10 +144,10 @@ include __DIR__ . '/../layout/sidebar.php';
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                        <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Ficha</th>
+                        <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">ID (Ficha)</th>
+                        <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Programa</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Instructor</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Ambiente</th>
-                        <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Competencia</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Fecha Inicio</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Estado</th>
                         <th style="padding: 16px; text-align: right; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Acciones</th>
@@ -166,16 +166,18 @@ include __DIR__ . '/../layout/sidebar.php';
                         <?php foreach ($registros as $registro): ?>
                         <tr style="border-bottom: 1px solid #f3f4f6;">
                             <td style="padding: 16px;">
-                                <strong style="color: #ec4899; font-size: 14px;"><?php echo htmlspecialchars($registro['ficha_numero'] ?? ''); ?></strong>
+                                <strong style="color: #ec4899; font-size: 14px;">
+                                    <?php echo str_pad(htmlspecialchars($registro['ficha_numero'] ?? ''), 8, '0', STR_PAD_LEFT); ?>
+                                </strong>
                             </td>
                             <td style="padding: 16px;">
-                                <div style="font-weight: 600; color: #1f2937;"><?php echo htmlspecialchars($registro['instructor_nombre'] ?? ''); ?></div>
+                                <div style="font-weight: 600; color: #1f2937;"><?php echo htmlspecialchars($registro['programa_nombre'] ?? 'N/A'); ?></div>
+                            </td>
+                            <td style="padding: 16px;">
+                                <div style="color: #6b7280;"><?php echo htmlspecialchars($registro['instructor_nombre'] ?? ''); ?></div>
                             </td>
                             <td style="padding: 16px; color: #6b7280;">
                                 <?php echo htmlspecialchars($registro['ambiente_nombre'] ?? 'N/A'); ?>
-                            </td>
-                            <td style="padding: 16px; color: #6b7280;">
-                                <?php echo htmlspecialchars($registro['competencia_nombre'] ?? 'N/A'); ?>
                             </td>
                             <td style="padding: 16px; color: #6b7280;">
                                 <?php echo isset($registro['asig_fecha_inicio']) ? date('d/m/Y', strtotime($registro['asig_fecha_inicio'])) : 'N/A'; ?>
@@ -877,7 +879,7 @@ function abrirModalNuevaAsignacion(fichaIdPreseleccionada = null) {
                             <option value="">Seleccione una ficha</option>
                             <?php foreach ($fichas as $ficha): ?>
                                 <option value="<?php echo htmlspecialchars($ficha['fich_id'] ?? ''); ?>" ${fichaId == '<?php echo $ficha['fich_id']; ?>' ? 'selected' : ''}>
-                                    Ficha <?php echo htmlspecialchars($ficha['fich_id'] ?? ''); ?>
+                                    Ficha <?php echo str_pad(htmlspecialchars($ficha['fich_numero'] ?? ''), 8, '0', STR_PAD_LEFT); ?> - <?php echo htmlspecialchars($ficha['prog_denominacion'] ?? ''); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
