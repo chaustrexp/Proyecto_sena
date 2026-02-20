@@ -1,5 +1,9 @@
     <!-- Script para Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Funcionalidades del Header -->
+    <script src="/Gestion-sena/dashboard_sena/assets/js/header-functions.js"></script>
+    
     <script>
         // Inicializar iconos de Lucide
         if (typeof lucide !== 'undefined') {

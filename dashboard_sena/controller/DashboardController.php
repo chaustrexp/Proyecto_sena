@@ -30,6 +30,9 @@ class DashboardController extends BaseController {
      * Página principal del dashboard
      */
     public function index() {
+        // Definir título de la página ANTES de cargar el header
+        $pageTitle = 'Dashboard Principal';
+        
         try {
             // Obtener estadísticas
             $totalProgramas = $this->programaModel->count();
@@ -44,51 +47,28 @@ class DashboardController extends BaseController {
             // Obtener asignaciones para el calendario
             $asignacionesCalendario = $this->asignacionModel->getForCalendar();
             
-            $data = [
-                'pageTitle' => 'Dashboard Principal',
-                'totalProgramas' => $totalProgramas,
-                'totalFichas' => $totalFichas,
-                'totalInstructores' => $totalInstructores,
-                'totalAmbientes' => $totalAmbientes,
-                'totalAsignaciones' => $totalAsignaciones,
-                'totalCompetenciasInstructor' => 0,
-                'competenciasVigentes' => 0,
-                'ultimasAsignaciones' => $ultimasAsignaciones,
-                'asignacionesCalendario' => $asignacionesCalendario
-            ];
-            
-            // Renderizar vista del dashboard
-            $pageTitle = $data['pageTitle'];
-            extract($data);
-            
-            include __DIR__ . '/../views/layout/header.php';
-            include __DIR__ . '/../views/layout/sidebar.php';
-            include __DIR__ . '/../index_content.php'; // Contenido del dashboard
-            include __DIR__ . '/../views/layout/footer.php';
+            // Datos para la vista
+            $totalCompetenciasInstructor = 0;
+            $competenciasVigentes = 0;
             
         } catch (Exception $e) {
             // En caso de error, mostrar valores por defecto
-            $data = [
-                'pageTitle' => 'Dashboard Principal',
-                'totalProgramas' => 0,
-                'totalFichas' => 0,
-                'totalInstructores' => 0,
-                'totalAmbientes' => 0,
-                'totalAsignaciones' => 0,
-                'totalCompetenciasInstructor' => 0,
-                'competenciasVigentes' => 0,
-                'ultimasAsignaciones' => [],
-                'asignacionesCalendario' => []
-            ];
-            
-            $pageTitle = $data['pageTitle'];
-            extract($data);
-            
-            include __DIR__ . '/../views/layout/header.php';
-            include __DIR__ . '/../views/layout/sidebar.php';
-            include __DIR__ . '/../index_content.php';
-            include __DIR__ . '/../views/layout/footer.php';
+            $totalProgramas = 0;
+            $totalFichas = 0;
+            $totalInstructores = 0;
+            $totalAmbientes = 0;
+            $totalAsignaciones = 0;
+            $totalCompetenciasInstructor = 0;
+            $competenciasVigentes = 0;
+            $ultimasAsignaciones = [];
+            $asignacionesCalendario = [];
         }
+        
+        // Renderizar vista del dashboard
+        include __DIR__ . '/../views/layout/header.php';
+        include __DIR__ . '/../views/layout/sidebar.php';
+        include __DIR__ . '/../views/dashboard/index.php';
+        include __DIR__ . '/../views/layout/footer.php';
     }
 }
 ?>

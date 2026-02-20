@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview - Header Mejorado</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f3f4f6;
+        }
+        
+        .demo-container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .demo-header {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        
+        .demo-header h1 {
+            font-size: 32px;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .demo-header p {
+            font-size: 16px;
+            color: #6b7280;
+        }
+        
+        .preview-section {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 32px;
+        }
+        
+        .section-title {
+            background: linear-gradient(135deg, #39A900 0%, #007832 100%);
+            color: white;
+            padding: 16px 24px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .section-content {
+            padding: 24px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+        
+        .feature-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            border-color: #39A900;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(57, 169, 0, 0.2);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #39A900 0%, #007832 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        
+        .feature-icon i {
+            color: white;
+            width: 24px;
+            height: 24px;
+        }
+        
+        .feature-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .feature-description {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+        .code-block {
+            background: #1f2937;
+            color: #10b981;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+        
+        .comparison-item {
+            padding: 24px;
+            border-radius: 12px;
+        }
+        
+        .comparison-before {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .comparison-after {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+        }
+        
+        .comparison-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .comparison-before .comparison-title {
+            color: #991b1b;
+        }
+        
+        .comparison-after .comparison-title {
+            color: #065f46;
+        }
+        
+        .comparison-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .comparison-list li {
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        
+        .comparison-before .comparison-list li {
+            color: #7f1d1d;
+        }
+        
+        .comparison-after .comparison-list li {
+            color: #064e3b;
+        }
+        
+        .comparison-list li::before {
+            margin-right: 8px;
+        }
+        
+        .comparison-before .comparison-list li::before {
+            content: '❌';
+        }
+        
+        .comparison-after .comparison-list li::before {
+            content: '✅';
+        }
+        
+        .screenshot {
+            width: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+        
+        .btn-demo {
+            display: inline-block;
+            background: linear-gradient(135deg, #39A900 0%, #007832 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 16px;
+        }
+        
+        .btn-demo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <div class="demo-header">
+            <h1>🎨 Header Mejorado - Dashboard SENA</h1>
+            <p>Nuevas características y funcionalidades implementadas</p>
+        </div>
+        
+        <!-- Comparación Antes/Después -->
+        <div class="preview-section">
+            <div class="section-title">📊 Comparación: Antes vs Después</div>
+            <div class="section-content">
+                <div class="comparison">
+                    <div class="comparison-item comparison-before">
+                        <div class="comparison-title">❌ Antes</div>
+                        <ul class="comparison-list">
+                            <li>Solo título y botón de cerrar sesión</li>
+                            <li>Sin logo institucional</li>
+                            <li>Sin búsqueda global</li>
+                            <li>Sin notificaciones</li>
+                            <li>Sin accesos rápidos</li>
+                            <li>Sin breadcrumbs</li>
+                            <li>Diseño básico</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item comparison-after">
+                        <div class="comparison-title">✅ Después</div>
+                        <ul class="comparison-list">
+                            <li>Logo del SENA visible</li>
+                            <li>Búsqueda global en tiempo real</li>
+                            <li>Sistema de notificaciones</li>
+                            <li>Accesos rápidos a acciones</li>
+                            <li>Menú de usuario completo</li>
+                            <li>Breadcrumbs para navegación</li>
+                            <li>Diseño profesional y moderno</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Nuevas Características -->
+        <div class="preview-section">
+            <div class="section-title">✨ Nuevas Características</div>
+            <div class="section-content">
+                <div class="feature-grid">
+                    <!-- Logo -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="image"></i>
+                        </div>
+                        <div class="feature-title">Logo Institucional</div>
+                        <div class="feature-description">
+                            Logo del SENA visible en el header con filtro blanco sobre fondo verde institucional.
+                        </div>
+                    </div>
+                    
+                    <!-- Búsqueda -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="search"></i>
+                        </div>
+                        <div class="feature-title">Búsqueda Global</div>
+                        <div class="feature-description">
+                            Busca fichas, instructores, ambientes y más en tiempo real. Resultados instantáneos mientras escribes.
+                        </div>
+                    </div>
+                    
+                    <!-- Notificaciones -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="bell"></i>
+                        </div>
+                        <div class="feature-title">Notificaciones</div>
+                        <div class="feature-description">
+                            Sistema de notificaciones con contador de no leídas. Mantente al día con las actividades del sistema.
+                        </div>
+                    </div>
+                    
+                    <!-- Accesos Rápidos -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="plus-circle"></i>
+                        </div>
+                        <div class="feature-title">Accesos Rápidos</div>
+                        <div class="feature-description">
+                            Crea nuevas asignaciones, instructores, fichas y ambientes con un solo clic desde cualquier página.
+                        </div>
+                    </div>
+                    
+                    <!-- Ayuda -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="help-circle"></i>
+                        </div>
+                        <div class="feature-title">Ayuda Contextual</div>
+                        <div class="feature-description">
+                            Acceso rápido a la documentación y guías del sistema. Ayuda siempre disponible.
+                        </div>
+                    </div>
+                    
+                    <!-- Menú Usuario -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="user"></i>
+                        </div>
+                        <div class="feature-title">Menú de Usuario</div>
+                        <div class="feature-description">
+                            Perfil completo con avatar, nombre, rol, y acceso a configuración y estado del sistema.
+                        </div>
+                    </div>
+                    
+                    <!-- Breadcrumbs -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="navigation"></i>
+                        </div>
+                        <div class="feature-title">Breadcrumbs</div>
+                        <div class="feature-description">
+                            Navegación jerárquica que muestra tu ubicación actual. Vuelve atrás fácilmente.
+                        </div>
+                    </div>
+                    
+                    <!-- Responsive -->
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="smartphone"></i>
+                        </div>
+                        <div class="feature-title">Diseño Responsive</div>
+                        <div class="feature-description">
+                            Funciona perfectamente en desktop, tablet y móvil. Adaptado a todos los dispositivos.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cómo Usar -->
+        <div class="preview-section">
+            <div class="section-title">📖 Cómo Usar</div>
+            <div class="section-content">
+                <h3 style="margin-bottom: 16px; color: #1f2937;">1. Agregar Breadcrumbs en tus Vistas</h3>
+                <p style="color: #6b7280; margin-bottom: 12px;">
+                    Define el array <code>$breadcrumbs</code> antes de incluir el header:
+                </p>
+                <div class="code-block">
+&lt;?php<br>
+// En tu vista o controlador<br>
+$breadcrumbs = [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;['label' => 'Asignaciones', 'url' => '/Gestion-sena/dashboard_sena/asignacion'],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;['label' => 'Crear Nueva', 'url' => '']<br>
+];<br>
+<br>
+$pageTitle = 'Crear Nueva Asignación';<br>
+<br>
+include __DIR__ . '/../layout/header.php';<br>
+?&gt;
+                </div>
+                
+                <h3 style="margin: 24px 0 16px; color: #1f2937;">2. Personalizar Información del Usuario</h3>
+                <p style="color: #6b7280; margin-bottom: 12px;">
+                    Establece las variables de sesión al hacer login:
+                </p>
+                <div class="code-block">
+&lt;?php<br>
+// En auth/login.php<br>
+$_SESSION['usuario_nombre'] = 'Juan Pérez';<br>
+$_SESSION['usuario_rol'] = 'Administrador';<br>
+$_SESSION['usuario_email'] = 'juan.perez@sena.edu.co';<br>
+?&gt;
+                </div>
+                
+                <h3 style="margin: 24px 0 16px; color: #1f2937;">3. Implementar Búsqueda Real</h3>
+                <p style="color: #6b7280; margin-bottom: 12px;">
+                    Crea un endpoint AJAX para búsqueda en tiempo real. Ver guía completa en:
+                </p>
+                <a href="../_docs/GUIA_HEADER_MEJORADO.md" class="btn-demo" target="_blank">
+                    Ver Guía Completa →
+                </a>
+            </div>
+        </div>
+        
+        <!-- Características Técnicas -->
+        <div class="preview-section">
+            <div class="section-title">⚙️ Características Técnicas</div>
+            <div class="section-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-title">🎨 CSS Moderno</div>
+                        <div class="feature-description">
+                            Flexbox, Grid, animaciones CSS3, transiciones suaves, y diseño responsive.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">⚡ JavaScript Vanilla</div>
+                        <div class="feature-description">
+                            Sin dependencias externas. JavaScript puro para máximo rendimiento.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">🎯 Lucide Icons</div>
+                        <div class="feature-description">
+                            Iconos modernos y consistentes. Más de 1000 iconos disponibles.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-title">🔒 Seguro</div>
+                        <div class="feature-description">
+                            Validación de sesiones, escape de HTML, y protección contra XSS.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Próximas Mejoras -->
+        <div class="preview-section">
+            <div class="section-title">🚀 Próximas Mejoras Sugeridas</div>
+            <div class="section-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="moon"></i>
+                        </div>
+                        <div class="feature-title">Modo Oscuro</div>
+                        <div class="feature-description">
+                            Implementar tema oscuro para reducir fatiga visual en uso prolongado.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="globe"></i>
+                        </div>
+                        <div class="feature-title">Multiidioma</div>
+                        <div class="feature-description">
+                            Soporte para múltiples idiomas (Español, Inglés, etc.).
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="maximize"></i>
+                        </div>
+                        <div class="feature-title">Pantalla Completa</div>
+                        <div class="feature-description">
+                            Botón para activar modo pantalla completa en presentaciones.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i data-lucide="command"></i>
+                        </div>
+                        <div class="feature-title">Atajos de Teclado</div>
+                        <div class="feature-description">
+                            Ctrl+K para búsqueda, Ctrl+N para nueva asignación, etc.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="text-align: center; padding: 32px; color: #6b7280;">
+            <p style="margin-bottom: 8px;">Dashboard SENA - Sistema de Gestión Académica</p>
+            <p style="font-size: 14px;">Versión 2.0 | Febrero 2026</p>
+        </div>
+    </div>
+    
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -280,3 +280,40 @@
       <body class="sena-enhanced-theme dark-mode">
    
    ============================================ */
+
+
+/* ============================================
+   HEADER MEJORADO - ESTILOS
+   ============================================ */
+
+/* Responsive para navbar */
+@media (max-width: 1024px) {
+    .navbar {
+        padding: 10px 24px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 8px 16px !important;
+        gap: 12px !important;
+    }
+    
+    .navbar-title h1 {
+        font-size: 14px !important;
+    }
+    
+    .btn-logout span {
+        display: none !important;
+    }
+    
+    .btn-logout {
+        padding: 6px 8px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-title h1 {
+        font-size: 13px !important;
+    }
+}

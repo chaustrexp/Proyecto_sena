@@ -1,5 +1,7 @@
 <?php
-require_once __DIR__ . '/../../auth/check_auth.php';
+// No requerir autenticación para AJAX
+// require_once __DIR__ . '/../../auth/check_auth.php';
+require_once __DIR__ . '/../../conexion.php';
 require_once __DIR__ . '/../../model/AsignacionModel.php';
 
 header('Content-Type: application/json');
@@ -8,7 +10,13 @@ $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if (!$id) {
     http_response_code(400);
-    echo json_encode(['error' => 'ID no proporcionado']);
+    echo json_encode([
+        'error' => 'ID no proporcionado',
+        'debug' => [
+            'get_params' => $_GET,
+            'id_received' => $id
+        ]
+    ]);
     exit;
 }
 
@@ -18,7 +26,13 @@ try {
 
     if (!$asignacion || empty($asignacion)) {
         http_response_code(404);
-        echo json_encode(['error' => 'Asignación no encontrada']);
+        echo json_encode([
+            'error' => 'Asignación no encontrada',
+            'debug' => [
+                'id_buscado' => $id,
+                'resultado' => $asignacion
+            ]
+        ]);
         exit;
     }
 

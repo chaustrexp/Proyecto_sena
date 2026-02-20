@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Header con Acciones - Dashboard SENA</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/theme-enhanced.css">
+    <style>
+        /* Estilos adicionales para la demo */
+        .demo-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-top: 20px;
+        }
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid #39A900;
+        }
+        .demo-section h3 {
+            color: #39A900;
+            margin-top: 0;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feature-list li::before {
+            content: "✓";
+            color: #39A900;
+            font-weight: bold;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body class="sena-enhanced-theme">
+    <!-- Navbar Moderno con Acciones -->
+    <nav class="navbar">
+        <!-- Título del Dashboard -->
+        <div class="navbar-title">
+            <h1>Dashboard Principal</h1>
+        </div>
+        
+        <!-- Barra de Búsqueda -->
+        <div class="navbar-search">
+            <i data-lucide="search"></i>
+            <input type="text" placeholder="Buscar..." class="search-input">
+        </div>
+        
+        <!-- Acciones del Header -->
+        <div class="navbar-actions">
+            <!-- Botón Agregar -->
+            <button class="navbar-btn" title="Agregar nuevo">
+                <i data-lucide="plus"></i>
+            </button>
+            
+            <!-- Notificaciones -->
+            <button class="navbar-btn navbar-notifications" title="Notificaciones">
+                <i data-lucide="bell"></i>
+                <span class="notification-badge">3</span>
+            </button>
+            
+            <!-- Ayuda -->
+            <button class="navbar-btn" title="Ayuda">
+                <i data-lucide="help-circle"></i>
+            </button>
+        </div>
+        
+        <!-- Botón Cerrar Sesión -->
+        <div class="navbar-user">
+            <a href="#" class="btn-logout">
+                <i data-lucide="log-out"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-wrapper">
+                <div class="logo-icon">
+                    <span style="color: white; font-weight: bold; font-size: 20px;">S</span>
+                </div>
+                <div class="logo-text">
+                    <h2>Dashboard</h2>
+                    <span>SENA</span>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <i data-lucide="home"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i data-lucide="users"></i>
+                        <span class="nav-text">Instructores</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i data-lucide="book-open"></i>
+                        <span class="nav-text">Programas</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="demo-content">
+            <h1 style="color: #39A900; margin-top: 0;">🎉 Header Mejorado con Nuevas Funcionalidades</h1>
+            
+            <div class="demo-section">
+                <h3>✨ Nuevas Características Agregadas</h3>
+                <ul class="feature-list">
+                    <li><strong>Barra de Búsqueda:</strong> Campo de búsqueda centrado con icono</li>
+                    <li><strong>Botón Agregar (+):</strong> Acceso rápido para crear nuevos elementos</li>
+                    <li><strong>Notificaciones:</strong> Icono de campana con contador de notificaciones (badge rojo)</li>
+                    <li><strong>Ayuda (?):</strong> Botón de ayuda para acceder a documentación</li>
+                    <li><strong>Diseño Responsive:</strong> Se adapta a diferentes tamaños de pantalla</li>
+                </ul>
+            </div>
+
+            <div class="demo-section">
+                <h3>🎨 Características de Diseño</h3>
+                <ul class="feature-list">
+                    <li>Mantiene el color verde SENA (#e8f5e9) del header original</li>
+                    <li>Botones con bordes verdes (#c8e6c9) y hover interactivo</li>
+                    <li>Iconos en color verde SENA (#39A900)</li>
+                    <li>Badge de notificaciones en rojo (#ef4444) para destacar</li>
+                    <li>Transiciones suaves en todos los elementos</li>
+                    <li>Diseño con flexbox para alineación perfecta</li>
+                </ul>
+            </div>
+
+            <div class="demo-section">
+                <h3>📱 Comportamiento Responsive</h3>
+                <ul class="feature-list">
+                    <li><strong>Desktop (>768px):</strong> Todos los elementos visibles</li>
+                    <li><strong>Tablet (768px):</strong> Búsqueda oculta, botones compactos</li>
+                    <li><strong>Mobile (<480px):</strong> Solo iconos esenciales, texto de logout oculto</li>
+                </ul>
+            </div>
+
+            <div class="demo-section">
+                <h3>🔧 Elementos Interactivos</h3>
+                <p><strong>Prueba los siguientes elementos:</strong></p>
+                <ul class="feature-list">
+                    <li>Haz hover sobre los botones para ver el efecto de resaltado</li>
+                    <li>El campo de búsqueda tiene focus con borde verde</li>
+                    <li>El badge de notificaciones muestra "3" notificaciones pendientes</li>
+                    <li>Todos los botones tienen tooltips informativos</li>
+                </ul>
+            </div>
+
+            <div class="demo-section">
+                <h3>💡 Próximos Pasos</h3>
+                <ul class="feature-list">
+                    <li>Implementar funcionalidad de búsqueda en tiempo real</li>
+                    <li>Crear dropdown de notificaciones al hacer clic</li>
+                    <li>Agregar modal de ayuda con documentación</li>
+                    <li>Conectar botón "+" con formularios de creación</li>
+                </ul>
+            </div>
+
+            <div style="background: #fff3cd; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107; margin-top: 30px;">
+                <h4 style="margin-top: 0; color: #856404;">⚠️ Nota Importante</h4>
+                <p style="margin: 0; color: #856404;">
+                    Este es un preview HTML estático. Para ver el header funcionando en el dashboard real, 
+                    limpia el caché del navegador (Ctrl + Shift + Delete) y recarga con Ctrl + F5.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+        
+        // Simular interacciones
+        document.querySelectorAll('.navbar-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const title = this.getAttribute('title');
+                alert('Funcionalidad: ' + title + '\n\nEsta funcionalidad se implementará en el dashboard real.');
+            });
+        });
+        
+        // Simular búsqueda
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                console.log('Buscando:', this.value);
+            });
+        }
+    </script>
+</body>
+</html>
