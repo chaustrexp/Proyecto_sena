@@ -1,5 +1,41 @@
 # Changelog - Dashboard SENA
 
+## [1.2.2] - 2026-02-20
+
+### 🆕 Nuevas Funcionalidades
+
+#### Campo Número de Ficha
+- ✅ **Nuevo campo `fich_numero`**: Almacena el número real de la ficha (ej: 3115418)
+- ✅ **Validación UNIQUE**: No permite números de ficha duplicados
+- ✅ **Formularios actualizados**: Campos para ingresar/editar número de ficha
+- ✅ **Visualización mejorada**: Muestra números completos con formato de 8 dígitos
+
+### 🔧 Mejoras
+
+#### Modelo FichaModel.php
+- ✅ Método `create()` actualizado para incluir `fich_numero`
+- ✅ Método `update()` actualizado para incluir `fich_numero`
+
+#### Modelo AsignacionModel.php
+- ✅ Todas las consultas ahora usan `fich_numero` en lugar de `fich_id`
+- ✅ Métodos actualizados: `getAll()`, `getById()`, `getRecent()`, `getForCalendar()`
+
+#### Formularios
+- ✅ `views/ficha/crear.php`: Campo número de ficha agregado
+- ✅ `views/ficha/editar.php`: Completamente actualizado con todos los campos correctos
+
+### 📁 Archivos Nuevos
+- `_database/agregar_campo_fich_numero.sql` - Script SQL para agregar el campo
+- `_docs/CAMPO_NUMERO_FICHA.md` - Documentación completa
+
+### 📁 Archivos Modificados
+- `model/FichaModel.php` - Métodos create() y update()
+- `model/AsignacionModel.php` - Todas las consultas
+- `views/ficha/crear.php` - Campo fich_numero
+- `views/ficha/editar.php` - Formulario completo
+
+---
+
 ## [1.2.1] - 2026-02-20
 
 ### 🐛 Correcciones

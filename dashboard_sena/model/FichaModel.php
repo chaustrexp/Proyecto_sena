@@ -41,10 +41,11 @@ class FichaModel {
     
     public function create($data) {
         $stmt = $this->db->prepare("
-            INSERT INTO FICHA (PROGRAMA_prog_id, INSTRUCTOR_inst_id_lider, fich_jornada, COORDINACION_coord_id, fich_fecha_ini_lectiva, fich_fecha_fin_lectiva) 
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO FICHA (fich_numero, PROGRAMA_prog_id, INSTRUCTOR_inst_id_lider, fich_jornada, COORDINACION_coord_id, fich_fecha_ini_lectiva, fich_fecha_fin_lectiva) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         return $stmt->execute([
+            $data['fich_numero'],
             $data['PROGRAMA_prog_id'],
             $data['INSTRUCTOR_inst_id_lider'],
             $data['fich_jornada'],
@@ -57,10 +58,11 @@ class FichaModel {
     public function update($id, $data) {
         $stmt = $this->db->prepare("
             UPDATE FICHA 
-            SET PROGRAMA_prog_id = ?, INSTRUCTOR_inst_id_lider = ?, fich_jornada = ?, COORDINACION_coord_id = ?, fich_fecha_ini_lectiva = ?, fich_fecha_fin_lectiva = ?
+            SET fich_numero = ?, PROGRAMA_prog_id = ?, INSTRUCTOR_inst_id_lider = ?, fich_jornada = ?, COORDINACION_coord_id = ?, fich_fecha_ini_lectiva = ?, fich_fecha_fin_lectiva = ?
             WHERE fich_id = ?
         ");
         return $stmt->execute([
+            $data['fich_numero'],
             $data['PROGRAMA_prog_id'],
             $data['INSTRUCTOR_inst_id_lider'],
             $data['fich_jornada'],

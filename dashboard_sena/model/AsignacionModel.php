@@ -12,7 +12,7 @@ class AsignacionModel {
         $stmt = $this->db->query("
             SELECT a.*,
                    a.ASIG_ID as asig_id,
-                   f.fich_id as ficha_numero,
+                   f.fich_numero as ficha_numero,
                    CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
                    amb.amb_nombre as ambiente_nombre,
                    c.comp_nombre_corto as competencia_nombre,
@@ -36,7 +36,7 @@ class AsignacionModel {
         $stmt = $this->db->prepare("
             SELECT a.*,
                    a.ASIG_ID as asig_id,
-                   f.fich_id as ficha_numero,
+                   f.fich_numero as ficha_numero,
                    CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
                    amb.amb_nombre as ambiente_nombre,
                    c.comp_nombre_corto as competencia_nombre,
@@ -126,7 +126,7 @@ class AsignacionModel {
         $stmt = $this->db->prepare("
             SELECT a.*,
                    a.ASIG_ID as asig_id,
-                   f.fich_id as ficha_numero,
+                   f.fich_numero as ficha_numero,
                    CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
                    amb.amb_nombre as ambiente_nombre,
                    c.comp_nombre_corto as competencia_nombre,
@@ -152,7 +152,7 @@ class AsignacionModel {
 
         $stmt = $this->db->prepare("
             SELECT a.ASIG_ID as id,
-                   f.fich_id as ficha_numero,
+                   f.fich_numero as ficha_numero,
                    CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
                    amb.amb_nombre as ambiente_nombre,
                    c.comp_nombre_corto as competencia_nombre,

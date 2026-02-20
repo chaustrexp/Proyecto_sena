@@ -34,6 +34,12 @@ include __DIR__ . '/../layout/sidebar.php';
         
         <form method="POST">
             <div class="form-group">
+                <label>Número de Ficha *</label>
+                <input type="number" name="fich_numero" class="form-control" placeholder="Ej: 3115418" required min="1" max="9999999">
+                <small style="color: #6b7280; font-size: 12px;">Ingrese el número completo de la ficha (7 dígitos)</small>
+            </div>
+            
+            <div class="form-group">
                 <label>Programa *</label>
                 <select name="PROGRAMA_prog_id" class="form-control" required>
                     <option value="">Seleccione un programa...</option>
