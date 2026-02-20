@@ -139,12 +139,19 @@ dashboard_sena/
 
 ### ✅ Gestión Completa
 - **Asignaciones**: Instructores, fichas, ambientes
-- **Fichas**: Grupos de formación
+- **Fichas**: Grupos de formación con números reales (ej: 3115418)
 - **Instructores**: Personal docente
 - **Ambientes**: Salones y espacios
 - **Programas**: Programas de formación
 - **Competencias**: Competencias técnicas
 - **Coordinaciones**: Áreas administrativas
+
+### ✅ Campo Número de Ficha
+- Almacenamiento de números completos de ficha (ej: 3115418)
+- Validación UNIQUE para evitar duplicados
+- Formato de visualización con 8 dígitos (03115418)
+- Integración completa en formularios y tablas
+- Ver: `_docs/CAMPO_NUMERO_FICHA.md` y `_docs/GUIA_RAPIDA_CAMPO_FICHA.md`
 
 ### ✅ Diseño Moderno
 - Colores institucionales SENA (#39A900, #007832)
