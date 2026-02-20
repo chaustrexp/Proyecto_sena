@@ -44,10 +44,10 @@ SELECT a.*,
        CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
        amb.amb_nombre as ambiente_nombre,
        c.comp_nombre_corto as competencia_nombre,
-       p.prog_nombre as programa_nombre  -- ← NUEVO CAMPO
+       p.prog_denominacion as programa_nombre  -- ← NUEVO CAMPO
 FROM ASIGNACION a
 LEFT JOIN FICHA f ON a.FICHA_fich_id = f.fich_id
-LEFT JOIN PROGRAMA p ON f.PROGRAMA_prog_id = p.prog_id  -- ← NUEVO JOIN
+LEFT JOIN PROGRAMA p ON f.PROGRAMA_prog_id = p.prog_codigo  -- ← NUEVO JOIN
 LEFT JOIN INSTRUCTOR i ON a.INSTRUCTOR_inst_id = i.inst_id
 LEFT JOIN AMBIENTE amb ON a.AMBIENTE_amb_id = amb.amb_id
 LEFT JOIN COMPETENCIA c ON a.COMPETENCIA_comp_id = c.comp_id
