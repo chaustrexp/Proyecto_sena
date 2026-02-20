@@ -40,6 +40,9 @@ class DashboardController extends BaseController {
             $totalInstructores = $this->instructorModel->count();
             $totalAmbientes = $this->ambienteModel->count();
             $totalAsignaciones = $this->asignacionModel->count();
+            $asignacionesActivas = $this->asignacionModel->countActivas();
+            $asignacionesFinalizadas = $this->asignacionModel->countFinalizadas();
+            $asignacionesNoActivas = $this->asignacionModel->countNoActivas();
             
             // Obtener últimas asignaciones
             $ultimasAsignaciones = $this->asignacionModel->getRecent(5);
@@ -58,6 +61,9 @@ class DashboardController extends BaseController {
             $totalInstructores = 0;
             $totalAmbientes = 0;
             $totalAsignaciones = 0;
+            $asignacionesActivas = 0;
+            $asignacionesFinalizadas = 0;
+            $asignacionesNoActivas = 0;
             $totalCompetenciasInstructor = 0;
             $competenciasVigentes = 0;
             $ultimasAsignaciones = [];

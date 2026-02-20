@@ -4,29 +4,82 @@ require_once __DIR__ . '/../../model/InstruCompetenciaModel.php';
 require_once __DIR__ . '/../../model/InstructorModel.php';
 require_once __DIR__ . '/../../model/ProgramaModel.php';
 require_once __DIR__ . '/../../model/CompetenciaModel.php';
+require_once __DIR__ . '/../../model/CompetenciaProgramaModel.php';
 
 $model = new InstruCompetenciaModel();
 $instructorModel = new InstructorModel();
 $programaModel = new ProgramaModel();
 $competenciaModel = new CompetenciaModel();
+$competenciaProgramaModel = new CompetenciaProgramaModel();
+
+$errorMsg = '';
 
 // Manejar creación desde modal
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_competencia'])) {
-    $model->create($_POST);
-    header('Location: index.php?msg=creado');
-    exit;
+    try {
+        // Verificar que la combinación programa+competencia existe en COMPETxPROGRAMA
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("
+            SELECT COUNT(*) as existe 
+            FROM COMPETxPROGRAMA 
+            WHERE PROGRAMA_prog_id = ? AND COMPETENCIA_comp_id = ?
+        ");
+        $stmt->execute([
+            $_POST['COMPETxPROGRAMA_PROGRAMA_prog_id'],
+            $_POST['COMPETxPROGRAMA_COMPETENCIA_comp_id']
+        ]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result['existe'] == 0) {
+            $errorMsg = 'La combinación de Programa y Competencia seleccionada no está asociada. Por favor, primero asocia la competencia con el programa en la sección "Competencias por Programa".';
+        } else {
+            $model->create($_POST);
+            header('Location: index.php?msg=creado');
+            exit;
+        }
+    } catch (PDOException $e) {
+        $errorMsg = 'Error al crear la asignación: ' . $e->getMessage();
+    }
 }
 
 if (isset($_GET['eliminar'])) {
-    $model->delete($_GET['eliminar']);
-    header('Location: index.php?msg=eliminado');
-    exit;
+    try {
+        $model->delete($_GET['eliminar']);
+        header('Location: index.php?msg=eliminado');
+        exit;
+    } catch (PDOException $e) {
+        $errorMsg = 'Error al eliminar: ' . $e->getMessage();
+    }
 }
 
-$registros = $model->getAll();
-$instructores = $instructorModel->getAll();
-$programas = $programaModel->getAll();
-$competencias = $competenciaModel->getAll();
+try {
+    $registros = $model->getAll();
+    $instructores = $instructorModel->getAll();
+    $programas = $programaModel->getAll();
+    $competencias = $competenciaModel->getAll();
+    
+    // Obtener asociaciones válidas de COMPETxPROGRAMA
+    $db = Database::getInstance()->getConnection();
+    $stmt = $db->query("
+        SELECT cp.*, 
+               p.prog_denominacion, 
+               c.comp_nombre_corto
+        FROM COMPETxPROGRAMA cp
+        LEFT JOIN PROGRAMA p ON cp.PROGRAMA_prog_id = p.prog_codigo
+        LEFT JOIN COMPETENCIA c ON cp.COMPETENCIA_comp_id = c.comp_id
+        ORDER BY p.prog_denominacion, c.comp_nombre_corto
+    ");
+    $competenciasPorPrograma = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+} catch (Exception $e) {
+    $errorMsg = 'Error al cargar datos: ' . $e->getMessage();
+    $registros = [];
+    $instructores = [];
+    $programas = [];
+    $competencias = [];
+    $competenciasPorPrograma = [];
+}
+
 $pageTitle = "Competencias de Instructores";
 include __DIR__ . '/../layout/header.php';
 include __DIR__ . '/../layout/sidebar.php';
@@ -45,7 +98,13 @@ include __DIR__ . '/../layout/sidebar.php';
         </button>
     </div>
 
-    <!-- Alert -->
+    <!-- Alerts -->
+    <?php if (!empty($errorMsg)): ?>
+        <div style="margin: 24px 32px; padding: 16px; background: #FEE2E2; border-left: 4px solid #DC2626; border-radius: 8px; color: #991B1B;">
+            <strong>⚠️ Error:</strong> <?php echo htmlspecialchars($errorMsg); ?>
+        </div>
+    <?php endif; ?>
+    
     <?php if (isset($_GET['msg'])): ?>
         <div class="alert alert-success" style="margin: 24px 32px;">
             <?php 
@@ -53,6 +112,14 @@ include __DIR__ . '/../layout/sidebar.php';
             if ($_GET['msg'] == 'actualizado') echo '✓ Competencia actualizada exitosamente';
             if ($_GET['msg'] == 'eliminado') echo '✓ Competencia eliminada exitosamente';
             ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php if (empty($competenciasPorPrograma)): ?>
+        <div style="margin: 24px 32px; padding: 16px; background: #FEF3C7; border-left: 4px solid #F59E0B; border-radius: 8px; color: #92400E;">
+            <strong>⚠️ Configuración Requerida:</strong> No hay competencias asociadas a programas. 
+            Primero debes crear asociaciones en la sección 
+            <a href="<?php echo BASE_URL; ?>views/competencia_programa/index.php" style="color: #39A900; font-weight: 600;">Competencias por Programa</a>.
         </div>
     <?php endif; ?>
 
@@ -164,8 +231,23 @@ include __DIR__ . '/../layout/sidebar.php';
 
     // Función para abrir modal de nueva competencia
     function abrirModalNuevaCompetencia() {
+        <?php if (empty($competenciasPorPrograma)): ?>
+            alert('⚠️ No hay competencias asociadas a programas.\n\nPrimero debes crear asociaciones en la sección "Competencias por Programa".');
+            return;
+        <?php endif; ?>
+        
         const hoy = new Date().toISOString().split('T')[0];
         const fechaFormateada = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        // Crear opciones agrupadas por programa
+        const competenciasPorPrograma = <?php echo json_encode($competenciasPorPrograma); ?>;
+        
+        let opcionesHTML = '<option value="">Seleccione una combinación Programa + Competencia</option>';
+        competenciasPorPrograma.forEach(cp => {
+            const valor = cp.PROGRAMA_prog_id + '|' + cp.COMPETENCIA_comp_id;
+            const texto = cp.prog_denominacion + ' → ' + cp.comp_nombre_corto;
+            opcionesHTML += `<option value="${valor}">${texto}</option>`;
+        });
         
         const modal = `
             <div id="modalNuevaCompetencia" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px;" onclick="if(event.target.id==='modalNuevaCompetencia') cerrarModalCompetencia()">
@@ -178,8 +260,10 @@ include __DIR__ . '/../layout/sidebar.php';
                     </div>
 
                     <!-- Formulario -->
-                    <form method="POST" action="" style="padding: 24px;">
+                    <form method="POST" action="" style="padding: 24px;" onsubmit="return validarFormulario()">
                         <input type="hidden" name="crear_competencia" value="1">
+                        <input type="hidden" name="COMPETxPROGRAMA_PROGRAMA_prog_id" id="programa_id_hidden">
+                        <input type="hidden" name="COMPETxPROGRAMA_COMPETENCIA_comp_id" id="competencia_id_hidden">
                         
                         <!-- Instructor -->
                         <div style="margin-bottom: 20px;">
@@ -194,30 +278,13 @@ include __DIR__ . '/../layout/sidebar.php';
                             </select>
                         </div>
 
-                        <!-- Programa -->
+                        <!-- Programa + Competencia (combinado) -->
                         <div style="margin-bottom: 20px;">
-                            <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px;">Programa:</label>
-                            <select name="COMPETxPROGRAMA_PROGRAMA_prog_id" required style="width: 100%; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 14px; background: white; color: #1f2937;">
-                                <option value="">Seleccione un programa</option>
-                                <?php foreach ($programas as $programa): ?>
-                                    <option value="<?php echo htmlspecialchars($programa['prog_codigo'] ?? ''); ?>">
-                                        <?php echo htmlspecialchars($programa['prog_denominacion'] ?? ''); ?>
-                                    </option>
-                                <?php endforeach; ?>
+                            <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px;">Programa y Competencia:</label>
+                            <select id="programa_competencia_combo" required onchange="separarProgramaCompetencia()" style="width: 100%; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 14px; background: white; color: #1f2937;">
+                                ${opcionesHTML}
                             </select>
-                        </div>
-
-                        <!-- Competencia -->
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px;">Competencia:</label>
-                            <select name="COMPETxPROGRAMA_COMPETENCIA_comp_id" required style="width: 100%; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 14px; background: white; color: #1f2937;">
-                                <option value="">Seleccione una competencia</option>
-                                <?php foreach ($competencias as $competencia): ?>
-                                    <option value="<?php echo htmlspecialchars($competencia['comp_id'] ?? ''); ?>">
-                                        <?php echo htmlspecialchars($competencia['comp_nombre_corto'] ?? ''); ?> - <?php echo htmlspecialchars($competencia['comp_nombre_unidad_competencia'] ?? ''); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                            <p style="font-size: 11px; color: #6b7280; margin: 6px 0 0; font-style: italic;">Solo se muestran combinaciones válidas ya asociadas</p>
                         </div>
 
                         <!-- Vigencia -->
@@ -241,6 +308,27 @@ include __DIR__ . '/../layout/sidebar.php';
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', modal);
+    }
+
+    function separarProgramaCompetencia() {
+        const combo = document.getElementById('programa_competencia_combo');
+        const valor = combo.value;
+        if (valor) {
+            const partes = valor.split('|');
+            document.getElementById('programa_id_hidden').value = partes[0];
+            document.getElementById('competencia_id_hidden').value = partes[1];
+        }
+    }
+
+    function validarFormulario() {
+        const programaId = document.getElementById('programa_id_hidden').value;
+        const competenciaId = document.getElementById('competencia_id_hidden').value;
+        
+        if (!programaId || !competenciaId) {
+            alert('Por favor seleccione una combinación de Programa y Competencia');
+            return false;
+        }
+        return true;
     }
 
     function cerrarModalCompetencia() {

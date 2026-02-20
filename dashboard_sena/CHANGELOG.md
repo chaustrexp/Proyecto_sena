@@ -1,5 +1,155 @@
 # Changelog - Dashboard SENA
 
+## [1.3.0] - 2026-02-20
+
+### 🆕 Nuevas Funcionalidades
+
+#### Estadísticas de Asignaciones en Dashboard
+- ✅ **Asignaciones Activas**: Contador de asignaciones en curso
+- ✅ **Asignaciones Finalizadas**: Contador de asignaciones completadas
+- ✅ **Asignaciones No Activas**: Contador de asignaciones pendientes
+- ✅ Tarjetas visuales con iconos y colores distintivos
+- ✅ Cálculo automático basado en fechas de inicio y fin
+
+#### Controlador de Fichas Completamente Funcional
+- ✅ **CRUD Completo**: Crear, leer, actualizar y eliminar fichas
+- ✅ **Validación Robusta**: Validación de campos requeridos y formatos
+- ✅ **Estadísticas**: Fichas totales, activas y finalizadas
+- ✅ **Estado Automático**: Cálculo de estado basado en fechas (Activa/Finalizada/Pendiente)
+- ✅ **Formularios Completos**: Todos los campos necesarios con selectores
+
+#### Corrección Error 500 en Instru_Competencia
+- ✅ **Validación de Integridad Referencial**: Verifica que combinaciones Programa+Competencia existan
+- ✅ **Modal Inteligente**: Solo muestra combinaciones válidas de COMPETxPROGRAMA
+- ✅ **Mensajes Claros**: Alertas informativas cuando falta configuración
+- ✅ **Manejo de Errores**: Try-catch robusto en todas las operaciones
+
+### 🔧 Mejoras
+
+#### Modelo AsignacionModel.php
+- ✅ Método `countActivas()`: Cuenta asignaciones en curso
+- ✅ Método `countFinalizadas()`: Cuenta asignaciones completadas
+- ✅ Método `countNoActivas()`: Cuenta asignaciones pendientes
+- ✅ Eliminado método `count()` duplicado
+
+#### Modelo FichaModel.php
+- ✅ Soporte completo para campo `fich_numero`
+- ✅ Consultas mejoradas con todos los JOINs necesarios
+- ✅ Flexibilidad en parámetros (acepta múltiples formatos de nombres)
+- ✅ Métodos `create()` y `update()` con validación
+
+#### Controlador FichaController.php
+- ✅ Agregados modelos de Instructor y Coordinación
+- ✅ Validación completa de datos (campos requeridos, formatos, fechas)
+- ✅ Cálculo de estadísticas (fichas activas vs finalizadas)
+- ✅ Manejo robusto de errores con try-catch
+- ✅ Mensajes de sesión para feedback al usuario
+
+#### Controlador DashboardController.php
+- ✅ Variables para asignaciones activas, finalizadas y no activas
+- ✅ Manejo de errores mejorado con valores por defecto
+
+#### Vista views/instru_competencia/index.php
+- ✅ Validación antes de insertar en base de datos
+- ✅ Carga de datos de COMPETxPROGRAMA
+- ✅ Modal con selector combinado Programa+Competencia
+- ✅ Alertas informativas y de error
+- ✅ Prevención de selecciones inválidas
+
+#### Vista views/ficha/index.php
+- ✅ Columna "Número de Ficha" con formato de 8 dígitos
+- ✅ Columna "Estado" con badges de colores
+- ✅ Estadísticas: Total, Activas, Finalizadas
+- ✅ Cálculo automático del estado basado en fechas
+
+#### Vista views/ficha/crear.php (Nueva)
+- ✅ Formulario completo con todos los campos
+- ✅ Validación en tiempo real con mensajes de error
+- ✅ Selectores para Programa, Instructor, Jornada, Coordinación
+- ✅ Campos de fecha con validación
+- ✅ Diseño moderno y consistente
+
+#### Vista views/dashboard/stats_cards.php
+- ✅ Tarjeta "Total Asignaciones" con badge de activas
+- ✅ Tarjeta "Asignaciones Finalizadas" con icono check verde
+- ✅ Tarjeta "Asignaciones No Activas" con icono reloj amarillo
+
+### 📁 Archivos Nuevos
+
+#### Tests
+- `_tests/test_asignaciones_estadisticas.php` - Test completo de estadísticas de asignaciones
+- `_tests/diagnostico_instru_competencia_completo.php` - Diagnóstico de integridad referencial
+
+#### Documentación
+- `_docs/SOLUCION_ERROR_INSTRU_COMPETENCIA.md` - Guía de solución del error 500
+- `_docs/RESUMEN_CORRECCION_FINAL.md` - Resumen ejecutivo de correcciones
+
+#### Vistas
+- `views/ficha/crear.php` - Formulario de creación de fichas (reescrito)
+
+### 📁 Archivos Modificados
+
+#### Modelos
+- `model/AsignacionModel.php` - Métodos de conteo de estadísticas
+- `model/FichaModel.php` - Soporte completo para fich_numero
+
+#### Controladores
+- `controller/FichaController.php` - Completamente funcional con validación
+- `controller/DashboardController.php` - Estadísticas de asignaciones
+
+#### Vistas
+- `views/ficha/index.php` - Número de ficha y estado
+- `views/instru_competencia/index.php` - Validación y modal mejorado
+- `views/dashboard/stats_cards.php` - Nuevas tarjetas de estadísticas
+
+### 🐛 Correcciones
+
+#### Error 500 en Instru_Competencia
+- ✅ **Causa identificada**: Restricción de clave foránea compuesta en COMPETxPROGRAMA
+- ✅ **Solución**: Validación antes de insertar + modal con opciones válidas
+- ✅ **Prevención**: Solo se muestran combinaciones que existen en la BD
+- ✅ **Mensajes**: Alertas claras cuando falta configuración
+
+#### Método count() Duplicado
+- ✅ Eliminado método `count()` duplicado en AsignacionModel.php
+- ✅ Mantenida una sola versión funcional
+
+### 📊 Estadísticas de esta Versión
+
+- **Archivos nuevos**: 4
+- **Archivos modificados**: 8
+- **Líneas de código agregadas**: ~2,800
+- **Funcionalidades nuevas**: 3 principales
+- **Bugs corregidos**: 2
+
+### 🚀 Próximas Mejoras
+
+- [ ] Vista de edición de fichas completamente funcional
+- [ ] Vista de detalle de fichas
+- [ ] Filtros avanzados en listado de fichas
+- [ ] Exportación de fichas a Excel/PDF
+- [ ] Validación de números de ficha únicos en tiempo real
+
+### 📝 Notas de Actualización
+
+**Para actualizar:**
+1. Hacer pull del repositorio
+2. Ejecutar script `_scripts/agregar_campo_fich_numero.php` si aún no lo has hecho
+3. Verificar que COMPETxPROGRAMA tenga datos (ir a "Competencias por Programa")
+4. Limpiar caché del navegador (Ctrl + Shift + Delete)
+5. Recargar con Ctrl + F5
+
+**Importante:**
+- El campo `fich_numero` debe agregarse a la base de datos antes de usar las fichas
+- La tabla COMPETxPROGRAMA debe tener datos antes de asignar competencias a instructores
+
+**Compatibilidad:**
+- PHP 7.4+
+- MySQL 5.7+
+- Apache con mod_rewrite
+
+---
+
 ## [1.2.2] - 2026-02-20
 
 ### 🆕 Nuevas Funcionalidades

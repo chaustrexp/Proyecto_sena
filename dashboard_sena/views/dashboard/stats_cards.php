@@ -59,8 +59,40 @@
                 <i data-lucide="calendar" style="width: 28px; height: 28px; color: #ec4899;"></i>
             </div>
             <div style="flex: 1;">
-                <div style="font-size: 12px; color: #9ca3af; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Asignaciones</div>
-                <div style="font-size: 28px; font-weight: 600; color: #1f2937; line-height: 1;"><?php echo $totalAsignaciones; ?></div>
+                <div style="font-size: 12px; color: #9ca3af; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Total Asignaciones</div>
+                <div style="display: flex; align-items: baseline; gap: 8px;">
+                    <div style="font-size: 28px; font-weight: 600; color: #1f2937; line-height: 1;"><?php echo $totalAsignaciones; ?></div>
+                    <div style="display: flex; align-items: center; gap: 4px; padding: 3px 8px; background: #DBEAFE; border-radius: 12px;">
+                        <i data-lucide="activity" style="width: 12px; height: 12px; color: #3b82f6;"></i>
+                        <span style="font-size: 11px; color: #1d4ed8; font-weight: 600;"><?php echo $asignacionesActivas; ?> activas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asignaciones Finalizadas -->
+    <div class="stat-card" style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.3s;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #E8F5E8 0%, #d4edda 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i data-lucide="check-circle" style="width: 28px; height: 28px; color: #39A900;"></i>
+            </div>
+            <div style="flex: 1;">
+                <div style="font-size: 12px; color: #9ca3af; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Finalizadas</div>
+                <div style="font-size: 28px; font-weight: 600; color: #1f2937; line-height: 1;"><?php echo $asignacionesFinalizadas; ?></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asignaciones No Activas -->
+    <div class="stat-card" style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.3s;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i data-lucide="clock" style="width: 28px; height: 28px; color: #f59e0b;"></i>
+            </div>
+            <div style="flex: 1;">
+                <div style="font-size: 12px; color: #9ca3af; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">No Activas</div>
+                <div style="font-size: 28px; font-weight: 600; color: #1f2937; line-height: 1;"><?php echo $asignacionesNoActivas; ?></div>
             </div>
         </div>
     </div>

@@ -41,15 +41,21 @@ include __DIR__ . '/../layout/sidebar.php';
     <?php endif; ?>
 
     <!-- Stats -->
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 24px 32px;">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 24px 32px;">
         <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
             <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Total Fichas</div>
-            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;"><?php echo count($registros); ?></div>
+            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;"><?php echo $totalFichas ?? count($registros); ?></div>
         </div>
         <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
-            <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Fichas Registradas</div>
+            <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Fichas Activas</div>
             <div style="font-size: 32px; font-weight: 700; color: #39A900;">
-                <?php echo count($registros); ?>
+                <?php echo $fichasActivas ?? 0; ?>
+            </div>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Fichas Finalizadas</div>
+            <div style="font-size: 32px; font-weight: 700; color: #6b7280;">
+                <?php echo ($totalFichas ?? 0) - ($fichasActivas ?? 0); ?>
             </div>
         </div>
     </div>
@@ -60,28 +66,50 @@ include __DIR__ . '/../layout/sidebar.php';
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                        <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">ID</th>
+                        <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Número Ficha</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Programa</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Jornada</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Fecha Inicio</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Fecha Fin</th>
+                        <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Estado</th>
                         <th style="padding: 16px; text-align: right; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($registros)): ?>
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 60px 20px; color: #6b7280;">
+                        <td colspan="7" style="text-align: center; padding: 60px 20px; color: #6b7280;">
                             <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
                             <p style="margin: 0 0 16px; font-size: 16px;">No hay fichas registradas</p>
                             <a href="crear.php" class="btn btn-primary btn-sm">Crear Primera Ficha</a>
                         </td>
                     </tr>
                     <?php else: ?>
-                        <?php foreach ($registros as $registro): ?>
+                        <?php 
+                        $hoy = date('Y-m-d');
+                        foreach ($registros as $registro): 
+                            // Determinar estado
+                            $estado = 'Pendiente';
+                            $estadoColor = '#f59e0b';
+                            $estadoBg = '#FEF3C7';
+                            
+                            if ($registro['fich_fecha_ini_lectiva'] && $registro['fich_fecha_fin_lectiva']) {
+                                if ($registro['fich_fecha_ini_lectiva'] <= $hoy && $registro['fich_fecha_fin_lectiva'] >= $hoy) {
+                                    $estado = 'Activa';
+                                    $estadoColor = '#39A900';
+                                    $estadoBg = '#E8F5E8';
+                                } elseif ($registro['fich_fecha_fin_lectiva'] < $hoy) {
+                                    $estado = 'Finalizada';
+                                    $estadoColor = '#6b7280';
+                                    $estadoBg = '#f3f4f6';
+                                }
+                            }
+                        ?>
                         <tr style="border-bottom: 1px solid #f3f4f6;">
                             <td style="padding: 16px;">
-                                <strong style="color: #3b82f6; font-size: 14px;"><?php echo htmlspecialchars($registro['fich_id']); ?></strong>
+                                <strong style="color: #3b82f6; font-size: 16px;">
+                                    <?php echo htmlspecialchars(str_pad($registro['fich_numero'] ?? $registro['fich_id'], 8, '0', STR_PAD_LEFT)); ?>
+                                </strong>
                             </td>
                             <td style="padding: 16px;">
                                 <div style="font-weight: 600; color: #1f2937;"><?php echo htmlspecialchars($registro['prog_denominacion'] ?? 'Sin programa'); ?></div>
@@ -94,6 +122,11 @@ include __DIR__ . '/../layout/sidebar.php';
                             </td>
                             <td style="padding: 16px; color: #6b7280;">
                                 <?php echo $registro['fich_fecha_fin_lectiva'] ? date('d/m/Y', strtotime($registro['fich_fecha_fin_lectiva'])) : 'N/A'; ?>
+                            </td>
+                            <td style="padding: 16px;">
+                                <span style="background: <?php echo $estadoBg; ?>; color: <?php echo $estadoColor; ?>; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                    <?php echo $estado; ?>
+                                </span>
                             </td>
                             <td style="padding: 16px;">
                                 <div class="btn-group" style="justify-content: flex-end;">

@@ -12,7 +12,7 @@ class AsignacionModel {
         $stmt = $this->db->query("
             SELECT a.*,
                    a.ASIG_ID as asig_id,
-                   COALESCE(f.fich_numero, f.fich_id) as ficha_numero,
+                   f.fich_id as ficha_numero,
                    CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
                    amb.amb_nombre as ambiente_nombre,
                    c.comp_nombre_corto as competencia_nombre,
@@ -36,7 +36,7 @@ class AsignacionModel {
         $stmt = $this->db->prepare("
             SELECT a.*,
                    a.ASIG_ID as asig_id,
-                   COALESCE(f.fich_numero, f.fich_id) as ficha_numero,
+                   f.fich_id as ficha_numero,
                    CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
                    amb.amb_nombre as ambiente_nombre,
                    c.comp_nombre_corto as competencia_nombre,
@@ -121,12 +121,60 @@ class AsignacionModel {
         $result = $stmt->fetch();
         return $result['total'];
     }
+
+    /**
+     * Cuenta asignaciones activas (en curso)
+     * Fecha actual está entre fecha_ini y fecha_fin
+     */
+    public function countActivas() {
+        $hoy = date('Y-m-d H:i:s');
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) as total
+            FROM ASIGNACION
+            WHERE asig_fecha_ini <= ? AND asig_fecha_fin >= ?
+        ");
+        $stmt->execute([$hoy, $hoy]);
+        $result = $stmt->fetch();
+        return $result['total'];
+    }
+
+    /**
+     * Cuenta asignaciones finalizadas
+     * Fecha fin ya pasó
+     */
+    public function countFinalizadas() {
+        $hoy = date('Y-m-d H:i:s');
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) as total
+            FROM ASIGNACION
+            WHERE asig_fecha_fin < ?
+        ");
+        $stmt->execute([$hoy]);
+        $result = $stmt->fetch();
+        return $result['total'];
+    }
+
+    /**
+     * Cuenta asignaciones no activas (pendientes)
+     * Fecha inicio aún no ha llegado
+     */
+    public function countNoActivas() {
+        $hoy = date('Y-m-d H:i:s');
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) as total
+            FROM ASIGNACION
+            WHERE asig_fecha_ini > ?
+        ");
+        $stmt->execute([$hoy]);
+        $result = $stmt->fetch();
+        return $result['total'];
+    }
     
     public function getRecent($limit = 5) {
         $stmt = $this->db->prepare("
             SELECT a.*,
                    a.ASIG_ID as asig_id,
-                   COALESCE(f.fich_numero, f.fich_id) as ficha_numero,
+                   f.fich_id as ficha_numero,
                    CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
                    amb.amb_nombre as ambiente_nombre,
                    c.comp_nombre_corto as competencia_nombre,
@@ -152,7 +200,7 @@ class AsignacionModel {
 
         $stmt = $this->db->prepare("
             SELECT a.ASIG_ID as id,
-                   COALESCE(f.fich_numero, f.fich_id) as ficha_numero,
+                   f.fich_id as ficha_numero,
                    CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
                    amb.amb_nombre as ambiente_nombre,
                    c.comp_nombre_corto as competencia_nombre,
