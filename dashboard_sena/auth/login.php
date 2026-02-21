@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $db = Database::getInstance()->getConnection();
             
-            // Buscar administrador
+            // Primero buscar en Administradores
             $stmt = $db->prepare("SELECT * FROM ADMINISTRADOR WHERE admin_correo = ? AND admin_estado = 'Activo'");
             $stmt->execute([$email]);
             $usuario = $stmt->fetch();
@@ -33,6 +33,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Actualizar último acceso
                 $stmt = $db->prepare("UPDATE ADMINISTRADOR SET admin_ultimo_acceso = NOW() WHERE admin_id = ?");
                 $stmt->execute([$usuario['admin_id']]);
+                
+                header('Location: /Gestion-sena/dashboard_sena/index.php');
+                exit;
+            }
+            
+            // Si no es administrador, buscar en Coordinadores
+            $stmt = $db->prepare("SELECT * FROM COORDINACION WHERE coord_correo = ?");
+            $stmt->execute([$email]);
+            $coordinador = $stmt->fetch();
+            
+            if ($coordinador && password_verify($password, $coordinador['coord_password'])) {
+                $_SESSION['usuario_id'] = $coordinador['coord_id'];
+                $_SESSION['usuario_nombre'] = $coordinador['coord_nombre_coordinador'];
+                $_SESSION['usuario_email'] = $coordinador['coord_correo'];
+                $_SESSION['usuario_rol'] = 'Coordinador';
+                $_SESSION['coordinacion_id'] = $coordinador['coord_id'];
+                $_SESSION['centro_formacion_id'] = $coordinador['CENTRO_FORMACION_cent_id'];
                 
                 header('Location: /Gestion-sena/dashboard_sena/index.php');
                 exit;
@@ -290,7 +307,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="login-right">
             <div class="welcome-text">
                 <h2>Bienvenido</h2>
-                <p>Ingrese sus credenciales de administrador</p>
+                <p>Ingrese sus credenciales (Administrador o Coordinador)</p>
             </div>
             
             <?php if ($error): ?>
