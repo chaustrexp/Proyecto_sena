@@ -119,17 +119,33 @@ include __DIR__ . '/../layout/sidebar.php';
                         <i data-lucide="calendar-days" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 8px;"></i>
                         Calendario de Asignaciones
                     </h2>
-                    <p style="font-size: 13px; color: #6b7280; margin: 0;">Vista mensual de todas las asignaciones</p>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0;">Vista <span id="vistaActual">mensual</span> de todas las asignaciones</p>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button id="prevMonth" class="btn btn-secondary btn-sm">
-                        <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
-                    </button>
-                    <span id="currentMonth" style="font-weight: 600; color: #1f2937; min-width: 150px; text-align: center;"></span>
-                    <button id="nextMonth" class="btn btn-secondary btn-sm">
-                        <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
-                    </button>
-                    <button id="todayBtn" class="btn btn-primary btn-sm" style="margin-left: 8px;">Hoy</button>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <!-- Selector de Vista -->
+                    <div style="display: flex; gap: 4px; background: #f3f4f6; padding: 4px; border-radius: 8px;">
+                        <button id="btnMes" class="btn-vista active" onclick="cambiarVista('mes')" style="padding: 6px 16px; border: none; background: white; color: #39A900; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                            Mes
+                        </button>
+                        <button id="btnSemana" class="btn-vista" onclick="cambiarVista('semana')" style="padding: 6px 16px; border: none; background: transparent; color: #6b7280; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                            Semana
+                        </button>
+                        <button id="btnDia" class="btn-vista" onclick="cambiarVista('dia')" style="padding: 6px 16px; border: none; background: transparent; color: #6b7280; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                            Día
+                        </button>
+                    </div>
+                    
+                    <!-- Navegación -->
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button id="prevMonth" class="btn btn-secondary btn-sm">
+                            <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <span id="currentMonth" style="font-weight: 600; color: #1f2937; min-width: 150px; text-align: center;"></span>
+                        <button id="nextMonth" class="btn btn-secondary btn-sm">
+                            <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <button id="todayBtn" class="btn btn-primary btn-sm" style="margin-left: 8px;">Hoy</button>
+                    </div>
                 </div>
             </div>
 
@@ -272,10 +288,40 @@ include __DIR__ . '/../layout/sidebar.php';
     let currentDate = new Date();
     let currentMonth = currentDate.getMonth();
     let currentYear = currentDate.getFullYear();
+    let currentView = 'mes'; // mes, semana, dia
     
     const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
                         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const dayNamesFull = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    
+    // Función para cambiar vista
+    function cambiarVista(vista) {
+        currentView = vista;
+        
+        // Actualizar botones activos
+        document.querySelectorAll('.btn-vista').forEach(btn => {
+            btn.style.background = 'transparent';
+            btn.style.color = '#6b7280';
+        });
+        
+        const btnActivo = document.getElementById(`btn${vista.charAt(0).toUpperCase() + vista.slice(1)}`);
+        btnActivo.style.background = 'white';
+        btnActivo.style.color = '#39A900';
+        
+        // Actualizar texto de vista
+        const textoVista = vista === 'mes' ? 'mensual' : vista === 'semana' ? 'semanal' : 'diaria';
+        document.getElementById('vistaActual').textContent = textoVista;
+        
+        // Renderizar según vista
+        if (vista === 'mes') {
+            renderCalendar();
+        } else if (vista === 'semana') {
+            renderWeekView();
+        } else {
+            renderDayView();
+        }
+    }
     
     function renderCalendar() {
         const firstDay = new Date(currentYear, currentMonth, 1);
@@ -374,31 +420,204 @@ include __DIR__ . '/../layout/sidebar.php';
         }
     }
     
+    // Vista Semanal
+    function renderWeekView() {
+        const startOfWeek = new Date(currentDate);
+        startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+        
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        
+        document.getElementById('currentMonth').textContent = 
+            `${startOfWeek.getDate()} ${monthNames[startOfWeek.getMonth()]} - ${endOfWeek.getDate()} ${monthNames[endOfWeek.getMonth()]} ${currentYear}`;
+        
+        let calendarHTML = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;">';
+        
+        // Headers de días
+        for (let i = 0; i < 7; i++) {
+            const day = new Date(startOfWeek);
+            day.setDate(startOfWeek.getDate() + i);
+            calendarHTML += `<div style="text-align: center; font-weight: 600; color: #6b7280; font-size: 12px; padding: 8px 0; text-transform: uppercase;">
+                ${dayNames[i]}<br><span style="font-size: 18px; color: #1f2937;">${day.getDate()}</span>
+            </div>`;
+        }
+        
+        // Días de la semana
+        const today = new Date();
+        for (let i = 0; i < 7; i++) {
+            const day = new Date(startOfWeek);
+            day.setDate(startOfWeek.getDate() + i);
+            const dateStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+            const isToday = day.getDate() === today.getDate() && day.getMonth() === today.getMonth() && day.getFullYear() === today.getFullYear();
+            
+            const dayAssignments = asignaciones.filter(a => {
+                const inicio = new Date(a.asig_fecha_inicio || a.fecha_inicio);
+                const fin = new Date(a.asig_fecha_fin || a.fecha_fin);
+                return day >= inicio && day <= fin;
+            });
+            
+            let dayStyle = 'min-height: 150px; padding: 12px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; transition: all 0.2s;';
+            if (isToday) {
+                dayStyle = 'min-height: 150px; padding: 12px; background: #E8F5E8; border: 2px solid #39A900; border-radius: 8px; transition: all 0.2s;';
+            }
+            
+            calendarHTML += `<div style="${dayStyle}" class="calendar-day" onclick="verAsignacionesDia('${dateStr}', ${JSON.stringify(dayAssignments).replace(/"/g, '&quot;')})">`;
+            
+            if (dayAssignments.length > 0) {
+                dayAssignments.forEach(asig => {
+                    const asigId = asig.asig_id || asig.ASIG_ID || asig.id;
+                    calendarHTML += `<div style="background: #39A900; color: white; padding: 6px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; cursor: pointer;" onclick="event.stopPropagation(); verDetalleAsignacion(${asigId})" title="${asig.instructor_nombre}">
+                        <div style="font-weight: 600;">📚 ${asig.ficha_numero}</div>
+                        <div style="font-size: 10px; opacity: 0.9;">${asig.asig_hora_inicio || asig.hora_inicio || '08:00'}</div>
+                    </div>`;
+                });
+            }
+            
+            calendarHTML += '</div>';
+        }
+        
+        calendarHTML += '</div>';
+        document.getElementById('calendar').innerHTML = calendarHTML;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    
+    // Vista Diaria
+    function renderDayView() {
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+        
+        document.getElementById('currentMonth').textContent = 
+            `${dayNamesFull[currentDate.getDay()]}, ${currentDate.getDate()} de ${monthNames[currentMonth]} ${currentYear}`;
+        
+        const dayAssignments = asignaciones.filter(a => {
+            const inicio = new Date(a.asig_fecha_inicio || a.fecha_inicio);
+            const fin = new Date(a.asig_fecha_fin || a.fecha_fin);
+            return currentDate >= inicio && currentDate <= fin;
+        });
+        
+        let calendarHTML = '<div style="max-width: 800px; margin: 0 auto;">';
+        
+        if (dayAssignments.length === 0) {
+            calendarHTML += `
+                <div style="text-align: center; padding: 60px 20px; color: #6b7280;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">📅</div>
+                    <p style="margin: 0 0 16px; font-size: 18px; font-weight: 600;">No hay asignaciones para este día</p>
+                    <button onclick="abrirModalNuevaAsignacion()" class="btn btn-primary">
+                        <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                        Crear Asignación
+                    </button>
+                </div>
+            `;
+        } else {
+            // Agrupar por hora
+            const asignacionesPorHora = {};
+            dayAssignments.forEach(asig => {
+                const hora = asig.asig_hora_inicio || asig.hora_inicio || '08:00';
+                if (!asignacionesPorHora[hora]) {
+                    asignacionesPorHora[hora] = [];
+                }
+                asignacionesPorHora[hora].push(asig);
+            });
+            
+            // Ordenar por hora
+            const horasOrdenadas = Object.keys(asignacionesPorHora).sort();
+            
+            horasOrdenadas.forEach(hora => {
+                calendarHTML += `<div style="margin-bottom: 24px;">
+                    <div style="font-size: 14px; font-weight: 700; color: #6b7280; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
+                        ${hora}
+                    </div>`;
+                
+                asignacionesPorHora[hora].forEach(asig => {
+                    const asigId = asig.asig_id || asig.ASIG_ID || asig.id;
+                    calendarHTML += `
+                        <div style="background: white; border: 2px solid #e5e7eb; border-left: 4px solid #39A900; border-radius: 8px; padding: 20px; margin-bottom: 12px; transition: all 0.2s; cursor: pointer;" 
+                             onmouseover="this.style.borderColor='#39A900'; this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(57, 169, 0, 0.2)'" 
+                             onmouseout="this.style.borderColor='#e5e7eb'; this.style.borderLeftColor='#39A900'; this.style.transform='translateX(0)'; this.style.boxShadow='none'"
+                             onclick="verDetalleAsignacion(${asigId})">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                <div>
+                                    <div style="font-weight: 700; color: #1f2937; font-size: 18px; margin-bottom: 4px;">📚 Ficha ${asig.ficha_numero}</div>
+                                    <div style="font-size: 14px; color: #6b7280;">
+                                        <strong>Instructor:</strong> ${asig.instructor_nombre}
+                                    </div>
+                                </div>
+                                <span style="background: #E8F5E8; color: #39A900; padding: 6px 14px; border-radius: 12px; font-size: 12px; font-weight: 600;">ACTIVA</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 14px; color: #6b7280;">
+                                ${asig.ambiente_nombre ? `<div><strong>Ambiente:</strong> ${asig.ambiente_nombre}</div>` : ''}
+                                ${asig.competencia_nombre ? `<div><strong>Competencia:</strong> ${asig.competencia_nombre}</div>` : ''}
+                                <div><strong>Horario:</strong> ${asig.asig_hora_inicio || asig.hora_inicio || '08:00'} - ${asig.asig_hora_fin || asig.hora_fin || '17:00'}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                calendarHTML += '</div>';
+            });
+        }
+        
+        calendarHTML += '</div>';
+        document.getElementById('calendar').innerHTML = calendarHTML;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    
     // Event listeners para navegación
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('prevMonth')?.addEventListener('click', () => {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
+            if (currentView === 'mes') {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                renderCalendar();
+            } else if (currentView === 'semana') {
+                currentDate.setDate(currentDate.getDate() - 7);
+                currentMonth = currentDate.getMonth();
+                currentYear = currentDate.getFullYear();
+                renderWeekView();
+            } else {
+                currentDate.setDate(currentDate.getDate() - 1);
+                currentMonth = currentDate.getMonth();
+                currentYear = currentDate.getFullYear();
+                renderDayView();
             }
-            renderCalendar();
         });
         
         document.getElementById('nextMonth')?.addEventListener('click', () => {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
+            if (currentView === 'mes') {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                renderCalendar();
+            } else if (currentView === 'semana') {
+                currentDate.setDate(currentDate.getDate() + 7);
+                currentMonth = currentDate.getMonth();
+                currentYear = currentDate.getFullYear();
+                renderWeekView();
+            } else {
+                currentDate.setDate(currentDate.getDate() + 1);
+                currentMonth = currentDate.getMonth();
+                currentYear = currentDate.getFullYear();
+                renderDayView();
             }
-            renderCalendar();
         });
         
         document.getElementById('todayBtn')?.addEventListener('click', () => {
             const today = new Date();
+            currentDate = new Date();
             currentMonth = today.getMonth();
             currentYear = today.getFullYear();
-            renderCalendar();
+            if (currentView === 'mes') {
+                renderCalendar();
+            } else if (currentView === 'semana') {
+                renderWeekView();
+            } else {
+                renderDayView();
+            }
         });
     });
     
