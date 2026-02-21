@@ -253,8 +253,8 @@ include __DIR__ . '/../layout/sidebar.php';
             <div id="modalNuevaCompetencia" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px;" onclick="if(event.target.id==='modalNuevaCompetencia') cerrarModalCompetencia()">
                 <div style="background: white; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 25px 70px rgba(0,0,0,0.4); overflow: hidden; max-height: 90vh; overflow-y: auto;" onclick="event.stopPropagation()">
                     
-                    <!-- Header Morado -->
-                    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); padding: 24px; color: white;">
+                    <!-- Header Verde SENA -->
+                    <div style="background: linear-gradient(135deg, #39A900 0%, #007832 100%); padding: 24px; color: white;">
                         <h3 style="font-size: 22px; font-weight: 700; margin: 0 0 4px;">Nueva Competencia de Instructor</h3>
                         <p style="font-size: 14px; margin: 0; opacity: 0.95;">${fechaFormateada}</p>
                     </div>
@@ -299,7 +299,7 @@ include __DIR__ . '/../layout/sidebar.php';
                             <button type="button" onclick="cerrarModalCompetencia()" style="flex: 1; padding: 14px; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">
                                 Cancelar
                             </button>
-                            <button type="submit" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(139, 92, 246, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(139, 92, 246, 0.3)'">
+                            <button type="submit" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #39A900 0%, #007832 100%); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(57, 169, 0, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(57, 169, 0, 0.3)'">
                                 Guardar
                             </button>
                         </div>
