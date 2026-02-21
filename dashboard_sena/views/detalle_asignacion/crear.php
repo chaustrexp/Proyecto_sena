@@ -24,30 +24,27 @@ include __DIR__ . '/../layout/sidebar.php';
         <form method="POST">
             <div class="form-group">
                 <label>Asignación *</label>
-                <select name="asignacion_id" class="form-control" required>
+                <select name="ASIGNACION_ASIG_ID" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <?php foreach ($asignaciones as $asignacion): ?>
-                        <option value="<?php echo $asignacion['id']; ?>">
-                            ID: <?php echo $asignacion['id']; ?> - Ficha: <?php echo $asignacion['ficha_numero']; ?> - Instructor: <?php echo $asignacion['instructor_nombre']; ?>
+                        <?php 
+                        $asig_id = $asignacion['asig_id'] ?? $asignacion['ASIG_ID'] ?? '';
+                        $ficha = $asignacion['ficha_numero'] ?? 'N/A';
+                        $instructor = $asignacion['instructor_nombre'] ?? 'N/A';
+                        ?>
+                        <option value="<?php echo $asig_id; ?>">
+                            ID: <?php echo $asig_id; ?> - Ficha: <?php echo $ficha; ?> - Instructor: <?php echo $instructor; ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="form-group">
-                <label>Fecha *</label>
-                <input type="date" name="fecha" class="form-control" required>
-            </div>
-            <div class="form-group">
                 <label>Hora Inicio *</label>
-                <input type="time" name="hora_inicio" class="form-control" required>
+                <input type="datetime-local" name="detasig_hora_ini" class="form-control" required>
             </div>
             <div class="form-group">
                 <label>Hora Fin *</label>
-                <input type="time" name="hora_fin" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Observaciones</label>
-                <textarea name="observaciones" class="form-control" rows="4"></textarea>
+                <input type="datetime-local" name="detasig_hora_fin" class="form-control" required>
             </div>
             <div class="btn-group">
                 <button type="submit" class="btn btn-primary">Guardar</button>

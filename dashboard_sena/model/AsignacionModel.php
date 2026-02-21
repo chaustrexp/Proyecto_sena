@@ -36,7 +36,8 @@ class AsignacionModel {
         $stmt = $this->db->prepare("
             SELECT a.*,
                    a.ASIG_ID as asig_id,
-                   f.fich_id as ficha_numero,
+                   a.ASIG_ID as id,
+                   COALESCE(f.fich_numero, f.fich_id) as ficha_numero,
                    CONCAT(i.inst_nombres, ' ', i.inst_apellidos) as instructor_nombre,
                    amb.amb_nombre as ambiente_nombre,
                    c.comp_nombre_corto as competencia_nombre,
@@ -44,7 +45,11 @@ class AsignacionModel {
                    DATE(a.asig_fecha_ini) as asig_fecha_inicio,
                    DATE(a.asig_fecha_fin) as asig_fecha_fin,
                    DATE(a.asig_fecha_ini) as fecha_inicio,
-                   DATE(a.asig_fecha_fin) as fecha_fin
+                   DATE(a.asig_fecha_fin) as fecha_fin,
+                   TIME(a.asig_fecha_ini) as asig_hora_inicio,
+                   TIME(a.asig_fecha_fin) as asig_hora_fin,
+                   TIME(a.asig_fecha_ini) as hora_inicio,
+                   TIME(a.asig_fecha_fin) as hora_fin
             FROM ASIGNACION a
             LEFT JOIN FICHA f ON a.FICHA_fich_id = f.fich_id
             LEFT JOIN PROGRAMA p ON f.PROGRAMA_prog_id = p.prog_codigo

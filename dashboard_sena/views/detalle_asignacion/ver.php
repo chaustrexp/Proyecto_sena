@@ -17,42 +17,22 @@ include __DIR__ . '/../layout/sidebar.php';
             <h2>Detalle de Asignación</h2>
             <div class="detail-row">
                 <div class="detail-label">ID:</div>
-                <div><?php echo safeHtml($registro, 'id'); ?></div>
+                <div><?php echo safeHtml($registro, 'detasig_id'); ?></div>
             </div>
             <div class="detail-row">
                 <div class="detail-label">Asignación ID:</div>
-                <div><?php echo safeHtml($registro, 'asignacion_id'); ?></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Ficha:</div>
-                <div><?php echo safeHtml($registro, 'ficha_numero'); ?></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Instructor:</div>
-                <div><?php echo safeHtml($registro, 'instructor_nombre'); ?></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Fecha:</div>
-                <div><?php echo safeHtml($registro, 'fecha'); ?></div>
+                <div><?php echo safeHtml($registro, 'ASIGNACION_ASIG_ID'); ?></div>
             </div>
             <div class="detail-row">
                 <div class="detail-label">Hora Inicio:</div>
-                <div><?php echo safeHtml($registro, 'hora_inicio'); ?></div>
+                <div><?php echo safeHtml($registro, 'detasig_hora_ini'); ?></div>
             </div>
             <div class="detail-row">
                 <div class="detail-label">Hora Fin:</div>
-                <div><?php echo safeHtml($registro, 'hora_fin'); ?></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Observaciones:</div>
-                <div><?php echo safeHtml($registro, 'observaciones'); ?></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Fecha Creación:</div>
-                <div><?php echo safeHtml($registro, 'created_at'); ?></div>
+                <div><?php echo safeHtml($registro, 'detasig_hora_fin'); ?></div>
             </div>
             <div class="btn-group" style="margin-top: 20px;">
-                <a href="editar.php?id=<?php echo safeHtml($registro, 'id'); ?>" class="btn btn-primary">Editar</a>
+                <a href="editar.php?id=<?php echo safeHtml($registro, 'detasig_id'); ?>" class="btn btn-primary">Editar</a>
                 <a href="index.php" class="btn btn-secondary">Volver</a>
             </div>
         <?php else: ?>
