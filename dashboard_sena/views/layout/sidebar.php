@@ -20,7 +20,7 @@
         <ul class="nav-list">
             <!-- Dashboard -->
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/dashboard" class="nav-link">
                     <i class="nav-icon" data-lucide="layout-dashboard"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
@@ -32,21 +32,21 @@
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/programa/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/programa" class="nav-link">
                     <i class="nav-icon" data-lucide="book-open"></i>
                     <span class="nav-text">Programas</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/ficha/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/ficha" class="nav-link">
                     <i class="nav-icon" data-lucide="file-text"></i>
                     <span class="nav-text">Fichas</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/competencia/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/competencia" class="nav-link">
                     <i class="nav-icon" data-lucide="target"></i>
                     <span class="nav-text">Competencias</span>
                 </a>
@@ -72,7 +72,7 @@
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/instructor/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/instructor" class="nav-link">
                     <i class="nav-icon" data-lucide="user"></i>
                     <span class="nav-text">Instructores</span>
                 </a>
@@ -86,14 +86,14 @@
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/ambiente/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/ambiente" class="nav-link">
                     <i class="nav-icon" data-lucide="home"></i>
                     <span class="nav-text">Ambientes</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/asignacion/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/asignacion" class="nav-link">
                     <i class="nav-icon" data-lucide="calendar"></i>
                     <span class="nav-text">Asignaciones</span>
                 </a>

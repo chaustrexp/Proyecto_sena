@@ -1,19 +1,6 @@
 <?php
-require_once __DIR__ . '/../../model/ProgramaModel.php';
-
-$model = new ProgramaModel();
-
-// Eliminar
-if (isset($_GET['eliminar'])) {
-    $model->delete($_GET['eliminar']);
-    header('Location: index.php?msg=eliminado');
-    exit;
-}
-
-$registros = $model->getAll();
-$pageTitle = "Gestión de Programas";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+// Vista de listado de programas
+// Los datos vienen del controlador: $pageTitle, $registros
 ?>
 
 <div class="main-content">
@@ -23,20 +10,22 @@ include __DIR__ . '/../layout/sidebar.php';
             <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">Programas de Formación</h1>
             <p style="font-size: 14px; color: #6b7280; margin: 0;">Gestiona los programas académicos del SENA</p>
         </div>
-        <a href="crear.php" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+        <a href="/Gestion-sena/dashboard_sena/programa/create" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
             <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
             Nuevo Programa
         </a>
     </div>
 
     <!-- Alert Messages -->
-    <?php if (isset($_GET['msg'])): ?>
+    <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success" style="margin: 24px 32px;">
-            <?php 
-            if ($_GET['msg'] == 'creado') echo '✓ Programa creado exitosamente';
-            if ($_GET['msg'] == 'actualizado') echo '✓ Programa actualizado exitosamente';
-            if ($_GET['msg'] == 'eliminado') echo '✓ Programa eliminado exitosamente';
-            ?>
+            ✓ <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-error" style="margin: 24px 32px;">
+            ✗ <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
         </div>
     <?php endif; ?>
 
@@ -73,7 +62,7 @@ include __DIR__ . '/../layout/sidebar.php';
                         <td colspan="5" style="text-align: center; padding: 60px 20px; color: #6b7280;">
                             <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
                             <p style="margin: 0 0 16px; font-size: 16px;">No hay programas registrados</p>
-                            <a href="crear.php" class="btn btn-primary btn-sm">Crear Primer Programa</a>
+                            <a href="/Gestion-sena/dashboard_sena/programa/create" class="btn btn-primary btn-sm">Crear Primer Programa</a>
                         </td>
                     </tr>
                     <?php else: ?>
@@ -95,8 +84,8 @@ include __DIR__ . '/../layout/sidebar.php';
                             </td>
                             <td style="padding: 16px;">
                                 <div class="btn-group" style="justify-content: flex-end;">
-                                    <a href="ver.php?id=<?php echo $registro['prog_codigo']; ?>" class="btn btn-secondary btn-sm">Ver</a>
-                                    <a href="editar.php?id=<?php echo $registro['prog_codigo']; ?>" class="btn btn-primary btn-sm">Editar</a>
+                                    <a href="/Gestion-sena/dashboard_sena/programa/show/<?php echo $registro['prog_codigo']; ?>" class="btn btn-secondary btn-sm">Ver</a>
+                                    <a href="/Gestion-sena/dashboard_sena/programa/edit/<?php echo $registro['prog_codigo']; ?>" class="btn btn-primary btn-sm">Editar</a>
                                     <button onclick="confirmarEliminacion(<?php echo $registro['prog_codigo']; ?>, 'programa')" class="btn btn-danger btn-sm">Eliminar</button>
                                 </div>
                             </td>
@@ -123,6 +112,11 @@ include __DIR__ . '/../layout/sidebar.php';
             this.style.background = 'white';
         });
     });
+    
+    // Función para confirmar eliminación
+    function confirmarEliminacion(id, tipo) {
+        if (confirm(`¿Está seguro de eliminar este ${tipo}?`)) {
+            window.location.href = `/Gestion-sena/dashboard_sena/programa/delete/${id}`;
+        }
+    }
 </script>
-
-<?php include __DIR__ . '/../layout/footer.php'; ?>

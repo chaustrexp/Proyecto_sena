@@ -9,16 +9,15 @@ require_once __DIR__ . '/auth/check_auth.php';
 
 // Obtener la ruta solicitada
 $request = $_SERVER['REQUEST_URI'];
-$scriptName = $_SERVER['SCRIPT_NAME'];
-$basePath = str_replace('routing.php', '', $scriptName);
+$basePath = '/Gestion-sena/dashboard_sena/';
 
 // Limpiar la ruta
 $route = str_replace($basePath, '', $request);
 $route = strtok($route, '?'); // Remover query string
 $route = trim($route, '/');
 
-// Si la ruta está vacía, ir al dashboard
-if (empty($route)) {
+// Si la ruta está vacía o es 'index.php', ir al dashboard
+if (empty($route) || $route === 'index.php') {
     $route = 'dashboard';
 }
 
@@ -27,6 +26,21 @@ $parts = explode('/', $route);
 $module = $parts[0] ?? 'dashboard';
 $action = $parts[1] ?? 'index';
 $id = $parts[2] ?? null;
+
+// Manejar acciones POST especiales
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Si viene de un formulario de crear, la acción es store
+    if ($action === 'create' || (isset($_POST['_action']) && $_POST['_action'] === 'store')) {
+        $action = 'store';
+        $id = null;
+    }
+    // Si viene de un formulario de editar, la acción es update
+    elseif ($action === 'edit' || (isset($_POST['_action']) && $_POST['_action'] === 'update')) {
+        $action = 'update';
+        // El ID viene en la URL o en el POST
+        $id = $id ?? ($_POST['id'] ?? null);
+    }
+}
 
 // Mapeo de rutas a controladores
 $routes = [
