@@ -1,11 +1,10 @@
 <?php
 require_once __DIR__ . '/../../auth/check_auth.php';
-require_once __DIR__ . '/../../model/FichaModel.php';
 require_once __DIR__ . '/../../model/ProgramaModel.php';
 require_once __DIR__ . '/../../model/InstructorModel.php';
 require_once __DIR__ . '/../../model/CoordinacionModel.php';
+require_once __DIR__ . '/../../helpers/functions.php';
 
-$model = new FichaModel();
 $programaModel = new ProgramaModel();
 $instructorModel = new InstructorModel();
 $coordinacionModel = new CoordinacionModel();
@@ -14,25 +13,11 @@ $programas = $programaModel->getAll();
 $instructores = $instructorModel->getAll();
 $coordinaciones = $coordinacionModel->getAll();
 
-$id = $_GET['id'] ?? 0;
-
-if (!$id) {
-    header('Location: index.php');
-    exit;
-}
-
-$registro = $model->getById($id);
-
-if (!$registro) {
-    header('Location: index.php?msg=no_encontrado');
-    exit;
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $model->update($id, $_POST);
-    header('Location: index.php?msg=actualizado');
-    exit;
-}
+// El registro viene del controlador
+$registro = $registro ?? null;
+$errors = $_SESSION['errors'] ?? [];
+$old_input = $_SESSION['old_input'] ?? [];
+unset($_SESSION['errors'], $_SESSION['old_input']);
 
 $pageTitle = "Editar Ficha";
 include __DIR__ . '/../layout/header.php';
@@ -46,7 +31,7 @@ include __DIR__ . '/../layout/sidebar.php';
             <p style="font-size: 14px; color: #6b7280; margin: 0;">Modifique los datos de la ficha</p>
         </div>
         
-        <form method="POST">
+        <form method="POST" action="/Gestion-sena/dashboard_sena/ficha/edit/<?php echo safeHtml($registro, 'fich_id'); ?>">
             <div class="form-group">
                 <label>Número de Ficha *</label>
                 <input type="number" name="fich_numero" class="form-control" value="<?php echo htmlspecialchars($registro['fich_numero'] ?? $registro['fich_id']); ?>" required min="1" max="9999999">
@@ -120,7 +105,7 @@ include __DIR__ . '/../layout/sidebar.php';
                     <i data-lucide="save" style="width: 18px; height: 18px;"></i>
                     Actualizar Ficha
                 </button>
-                <a href="index.php" class="btn btn-secondary">
+                <a href="/Gestion-sena/dashboard_sena/ficha" class="btn btn-secondary">
                     <i data-lucide="x" style="width: 18px; height: 18px;"></i>
                     Cancelar
                 </a>

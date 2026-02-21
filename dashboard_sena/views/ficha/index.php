@@ -1,19 +1,6 @@
 <?php
-require_once __DIR__ . '/../../auth/check_auth.php';
-require_once __DIR__ . '/../../model/FichaModel.php';
-
-$model = new FichaModel();
-
-if (isset($_GET['eliminar'])) {
-    $model->delete($_GET['eliminar']);
-    header('Location: index.php?msg=eliminado');
-    exit;
-}
-
-$registros = $model->getAll();
-$pageTitle = "Gestión de Fichas";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+// Vista de listado de fichas
+// Los datos vienen del controlador: $pageTitle, $registros, $totalFichas, $fichasActivas
 ?>
 
 <div class="main-content">
@@ -23,20 +10,22 @@ include __DIR__ . '/../layout/sidebar.php';
             <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">Fichas de Formación</h1>
             <p style="font-size: 14px; color: #6b7280; margin: 0;">Gestiona las fichas de los programas</p>
         </div>
-        <a href="crear.php" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+        <a href="/Gestion-sena/dashboard_sena/ficha/create" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
             <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
             Nueva Ficha
         </a>
     </div>
 
-    <!-- Alert -->
-    <?php if (isset($_GET['msg'])): ?>
+    <!-- Alert Messages -->
+    <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success" style="margin: 24px 32px;">
-            <?php 
-            if ($_GET['msg'] == 'creado') echo '✓ Ficha creada exitosamente';
-            if ($_GET['msg'] == 'actualizado') echo '✓ Ficha actualizada exitosamente';
-            if ($_GET['msg'] == 'eliminado') echo '✓ Ficha eliminada exitosamente';
-            ?>
+            ✓ <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-error" style="margin: 24px 32px;">
+            ✗ <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
         </div>
     <?php endif; ?>
 
@@ -81,7 +70,7 @@ include __DIR__ . '/../layout/sidebar.php';
                         <td colspan="7" style="text-align: center; padding: 60px 20px; color: #6b7280;">
                             <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
                             <p style="margin: 0 0 16px; font-size: 16px;">No hay fichas registradas</p>
-                            <a href="crear.php" class="btn btn-primary btn-sm">Crear Primera Ficha</a>
+                            <a href="/Gestion-sena/dashboard_sena/ficha/create" class="btn btn-primary btn-sm">Crear Primera Ficha</a>
                         </td>
                     </tr>
                     <?php else: ?>
@@ -130,8 +119,8 @@ include __DIR__ . '/../layout/sidebar.php';
                             </td>
                             <td style="padding: 16px;">
                                 <div class="btn-group" style="justify-content: flex-end;">
-                                    <a href="ver.php?id=<?php echo $registro['fich_id']; ?>" class="btn btn-secondary btn-sm">Ver</a>
-                                    <a href="editar.php?id=<?php echo $registro['fich_id']; ?>" class="btn btn-primary btn-sm">Editar</a>
+                                    <a href="/Gestion-sena/dashboard_sena/ficha/show/<?php echo $registro['fich_id']; ?>" class="btn btn-secondary btn-sm">Ver</a>
+                                    <a href="/Gestion-sena/dashboard_sena/ficha/edit/<?php echo $registro['fich_id']; ?>" class="btn btn-primary btn-sm">Editar</a>
                                     <button onclick="confirmarEliminacion(<?php echo $registro['fich_id']; ?>, 'ficha')" class="btn btn-danger btn-sm">Eliminar</button>
                                 </div>
                             </td>
@@ -159,6 +148,11 @@ include __DIR__ . '/../layout/sidebar.php';
             });
         }
     });
+    
+    // Función para confirmar eliminación
+    function confirmarEliminacion(id, tipo) {
+        if (confirm(`¿Está seguro de eliminar esta ${tipo}?`)) {
+            window.location.href = `/Gestion-sena/dashboard_sena/ficha/delete/${id}`;
+        }
+    }
 </script>
-
-<?php include __DIR__ . '/../layout/footer.php'; ?>

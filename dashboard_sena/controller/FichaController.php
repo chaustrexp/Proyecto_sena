@@ -42,51 +42,34 @@ class FichaController extends BaseController {
                 }
             }
             
-            $data = [
-                'pageTitle' => 'Gestión de Fichas',
-                'registros' => $registros,
-                'totalFichas' => $totalFichas,
-                'fichasActivas' => $fichasActivas,
-                'mensaje' => $this->getFlashMessage()
-            ];
+            $pageTitle = 'Gestión de Fichas';
+            $mensaje = $this->getFlashMessage();
             
-            $this->render('index', $data);
+            $this->loadView('index', compact('pageTitle', 'registros', 'totalFichas', 'fichasActivas', 'mensaje'));
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al cargar fichas: ' . $e->getMessage();
-            $this->render('index', [
-                'pageTitle' => 'Gestión de Fichas',
-                'registros' => [],
-                'totalFichas' => 0,
-                'fichasActivas' => 0
-            ]);
+            $pageTitle = 'Gestión de Fichas';
+            $registros = [];
+            $totalFichas = 0;
+            $fichasActivas = 0;
+            $this->loadView('index', compact('pageTitle', 'registros', 'totalFichas', 'fichasActivas'));
         }
     }
     
     /**
      * Formulario de creación
      */
-    public function crear() {
-        if ($this->isMethod('POST')) {
-            return $this->store();
-        }
-        
+    public function create() {
         try {
-            $data = [
-                'pageTitle' => 'Nueva Ficha',
-                'programas' => $this->programaModel->getAll(),
-                'instructores' => $this->instructorModel->getAll(),
-                'coordinaciones' => $this->coordinacionModel->getAll(),
-                'old_input' => $_SESSION['old_input'] ?? [],
-                'errors' => $_SESSION['errors'] ?? []
-            ];
+            $pageTitle = 'Nueva Ficha';
+            $programas = $this->programaModel->getAll();
+            $instructores = $this->instructorModel->getAll();
+            $coordinaciones = $this->coordinacionModel->getAll();
             
-            // Limpiar sesión
-            unset($_SESSION['old_input'], $_SESSION['errors']);
-            
-            $this->render('crear', $data);
+            $this->loadView('crear', compact('pageTitle', 'programas', 'instructores', 'coordinaciones'));
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al cargar formulario: ' . $e->getMessage();
-            $this->redirect('index.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/ficha');
         }
     }
     
@@ -94,121 +77,100 @@ class FichaController extends BaseController {
      * Guardar nueva ficha
      */
     public function store() {
+        if (!$this->isMethod('POST')) {
+            $this->redirect('/Gestion-sena/dashboard_sena/ficha/create');
+            return;
+        }
+        
         // Validación básica
-        $required = ['fich_numero', 'programa_id', 'jornada', 'fecha_inicio', 'fecha_fin'];
+        $required = ['fich_numero', 'PROGRAMA_prog_id', 'fich_jornada', 'fich_fecha_ini_lectiva', 'fich_fecha_fin_lectiva'];
         $errors = [];
         
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
-                $errors[$field] = 'Este campo es requerido';
+                $errors[] = "El campo " . str_replace('_', ' ', $field) . " es requerido";
             }
         }
         
         // Validar que el número de ficha sea numérico
         if (!empty($_POST['fich_numero']) && !is_numeric($_POST['fich_numero'])) {
-            $errors['fich_numero'] = 'El número de ficha debe ser numérico';
+            $errors[] = 'El número de ficha debe ser numérico';
         }
         
         // Validar fechas
-        if (!empty($_POST['fecha_inicio']) && !empty($_POST['fecha_fin'])) {
-            if (strtotime($_POST['fecha_inicio']) > strtotime($_POST['fecha_fin'])) {
-                $errors['fecha_fin'] = 'La fecha fin debe ser posterior a la fecha inicio';
+        if (!empty($_POST['fich_fecha_ini_lectiva']) && !empty($_POST['fich_fecha_fin_lectiva'])) {
+            if (strtotime($_POST['fich_fecha_ini_lectiva']) > strtotime($_POST['fich_fecha_fin_lectiva'])) {
+                $errors[] = 'La fecha fin debe ser posterior a la fecha inicio';
             }
         }
         
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['old_input'] = $_POST;
-            $this->redirect('crear.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/ficha/create');
             return;
         }
         
         try {
-            $this->model->create($_POST);
-            $_SESSION['success'] = 'Ficha creada exitosamente';
-            $this->redirect('index.php?msg=creado');
+            $result = $this->model->create($_POST);
+            if ($result) {
+                $_SESSION['success'] = 'Ficha creada exitosamente';
+                $this->redirect('/Gestion-sena/dashboard_sena/ficha');
+            } else {
+                $_SESSION['error'] = 'No se pudo crear la ficha';
+                $_SESSION['old_input'] = $_POST;
+                $this->redirect('/Gestion-sena/dashboard_sena/ficha/create');
+            }
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al crear la ficha: ' . $e->getMessage();
             $_SESSION['old_input'] = $_POST;
-            $this->redirect('crear.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/ficha/create');
         }
     }
     
     /**
      * Ver detalle de ficha
      */
-    public function ver() {
-        $id = $this->get('id', 0);
-        
-        if (!$id) {
-            $_SESSION['error'] = 'ID de ficha no válido';
-            $this->redirect('index.php');
-            return;
-        }
-        
+    public function show($id) {
         try {
             $registro = $this->model->getById($id);
             
             if (!$registro) {
                 $_SESSION['error'] = 'Ficha no encontrada';
-                $this->redirect('index.php');
+                $this->redirect('/Gestion-sena/dashboard_sena/ficha');
                 return;
             }
             
-            $data = [
-                'pageTitle' => 'Ver Ficha #' . $registro['fich_numero'],
-                'registro' => $registro
-            ];
-            
-            $this->render('ver', $data);
+            $pageTitle = 'Ver Ficha #' . ($registro['fich_numero'] ?? $id);
+            $this->loadView('ver', compact('pageTitle', 'registro'));
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al cargar ficha: ' . $e->getMessage();
-            $this->redirect('index.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/ficha');
         }
     }
     
     /**
      * Formulario de edición
      */
-    public function editar() {
-        $id = $this->get('id', 0);
-        
-        if (!$id) {
-            $_SESSION['error'] = 'ID de ficha no válido';
-            $this->redirect('index.php');
-            return;
-        }
-        
-        if ($this->isMethod('POST')) {
-            return $this->update($id);
-        }
-        
+    public function edit($id) {
         try {
             $registro = $this->model->getById($id);
             
             if (!$registro) {
                 $_SESSION['error'] = 'Ficha no encontrada';
-                $this->redirect('index.php');
+                $this->redirect('/Gestion-sena/dashboard_sena/ficha');
                 return;
             }
             
-            $data = [
-                'pageTitle' => 'Editar Ficha #' . $registro['fich_numero'],
-                'registro' => $registro,
-                'programas' => $this->programaModel->getAll(),
-                'instructores' => $this->instructorModel->getAll(),
-                'coordinaciones' => $this->coordinacionModel->getAll(),
-                'old_input' => $_SESSION['old_input'] ?? [],
-                'errors' => $_SESSION['errors'] ?? []
-            ];
+            $pageTitle = 'Editar Ficha #' . ($registro['fich_numero'] ?? $id);
+            $programas = $this->programaModel->getAll();
+            $instructores = $this->instructorModel->getAll();
+            $coordinaciones = $this->coordinacionModel->getAll();
             
-            // Limpiar sesión
-            unset($_SESSION['old_input'], $_SESSION['errors']);
-            
-            $this->render('editar', $data);
+            $this->loadView('editar', compact('pageTitle', 'registro', 'programas', 'instructores', 'coordinaciones'));
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al cargar ficha: ' . $e->getMessage();
-            $this->redirect('index.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/ficha');
         }
     }
     
@@ -216,66 +178,78 @@ class FichaController extends BaseController {
      * Actualizar ficha
      */
     public function update($id) {
+        if (!$this->isMethod('POST')) {
+            $this->redirect("/Gestion-sena/dashboard_sena/ficha/edit/{$id}");
+            return;
+        }
+        
         // Validación básica
-        $required = ['fich_numero', 'programa_id', 'jornada', 'fecha_inicio', 'fecha_fin'];
+        $required = ['fich_numero', 'PROGRAMA_prog_id', 'fich_jornada', 'fich_fecha_ini_lectiva', 'fich_fecha_fin_lectiva'];
         $errors = [];
         
         foreach ($required as $field) {
             if (empty($_POST[$field])) {
-                $errors[$field] = 'Este campo es requerido';
+                $errors[] = "El campo " . str_replace('_', ' ', $field) . " es requerido";
             }
         }
         
         // Validar que el número de ficha sea numérico
         if (!empty($_POST['fich_numero']) && !is_numeric($_POST['fich_numero'])) {
-            $errors['fich_numero'] = 'El número de ficha debe ser numérico';
+            $errors[] = 'El número de ficha debe ser numérico';
         }
         
         // Validar fechas
-        if (!empty($_POST['fecha_inicio']) && !empty($_POST['fecha_fin'])) {
-            if (strtotime($_POST['fecha_inicio']) > strtotime($_POST['fecha_fin'])) {
-                $errors['fecha_fin'] = 'La fecha fin debe ser posterior a la fecha inicio';
+        if (!empty($_POST['fich_fecha_ini_lectiva']) && !empty($_POST['fich_fecha_fin_lectiva'])) {
+            if (strtotime($_POST['fich_fecha_ini_lectiva']) > strtotime($_POST['fich_fecha_fin_lectiva'])) {
+                $errors[] = 'La fecha fin debe ser posterior a la fecha inicio';
             }
         }
         
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['old_input'] = $_POST;
-            $this->redirect("editar.php?id={$id}");
+            $this->redirect("/Gestion-sena/dashboard_sena/ficha/edit/{$id}");
             return;
         }
         
         try {
-            $this->model->update($id, $_POST);
-            $_SESSION['success'] = 'Ficha actualizada exitosamente';
-            $this->redirect('index.php?msg=actualizado');
+            $result = $this->model->update($id, $_POST);
+            if ($result) {
+                $_SESSION['success'] = 'Ficha actualizada exitosamente';
+                $this->redirect('/Gestion-sena/dashboard_sena/ficha');
+            } else {
+                $_SESSION['error'] = 'No se pudo actualizar la ficha';
+                $_SESSION['old_input'] = $_POST;
+                $this->redirect("/Gestion-sena/dashboard_sena/ficha/edit/{$id}");
+            }
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al actualizar la ficha: ' . $e->getMessage();
             $_SESSION['old_input'] = $_POST;
-            $this->redirect("editar.php?id={$id}");
+            $this->redirect("/Gestion-sena/dashboard_sena/ficha/edit/{$id}");
         }
     }
     
     /**
      * Eliminar ficha
      */
-    public function eliminar() {
-        $id = $this->get('id', 0);
-        
-        if (!$id) {
-            $_SESSION['error'] = 'ID de ficha no válido';
-            $this->redirect('index.php');
-            return;
-        }
-        
+    public function delete($id) {
         try {
             $this->model->delete($id);
             $_SESSION['success'] = 'Ficha eliminada exitosamente';
-            $this->redirect('index.php?msg=eliminado');
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al eliminar la ficha: ' . $e->getMessage();
-            $this->redirect('index.php');
         }
+        
+        $this->redirect('/Gestion-sena/dashboard_sena/ficha');
+    }
+    
+    // Método auxiliar para cargar vistas
+    private function loadView($view, $data = []) {
+        extract($data);
+        include __DIR__ . '/../views/layout/header.php';
+        include __DIR__ . '/../views/layout/sidebar.php';
+        include __DIR__ . "/../views/{$this->viewPath}/{$view}.php";
+        include __DIR__ . '/../views/layout/footer.php';
     }
 }
 ?>
