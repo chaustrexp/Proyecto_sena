@@ -1,40 +1,46 @@
 <?php
-require_once __DIR__ . '/../../auth/check_auth.php';
-require_once __DIR__ . '/../../model/TituloProgramaModel.php';
-
-$model = new TituloProgramaModel();
-$id = safe($_GET, 'id', 0);
-$registro = $model->getById($id);
-
-$pageTitle = "Ver Título de Programa";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+// Vista de ver titulo_programa
+// Los datos vienen del controlador: $pageTitle, $registro
 ?>
 
 <div class="main-content">
-    <div class="detail-card">
-        <?php if (registroValido($registro)): ?>
-            <h2>Detalle del Título de Programa</h2>
-            <div class="detail-row">
-                <div class="detail-label">ID:</div>
-                <div><?php echo safeHtml($registro, 'titpro_id'); ?></div>
+    <div style="max-width: 700px; margin: 0 auto; padding: 32px;">
+        <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 32px;">
+            <div style="margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid #e5e7eb;">
+                <a href="/Gestion-sena/dashboard_sena/titulo_programa/index" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; margin-bottom: 16px; font-size: 14px;">
+                    <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
+                    Volver a Títulos de Programa
+                </a>
+                <h1 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">Detalle del Título</h1>
+                <p style="font-size: 14px; color: #6b7280; margin: 0;">Información completa del título de programa</p>
             </div>
-            <div class="detail-row">
-                <div class="detail-label">NOMBRE:</div>
-                <div><?php echo safeHtml($registro, 'titpro_nombre'); ?></div>
+            
+            <div style="display: grid; gap: 24px;">
+                <div style="padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 8px;">ID</div>
+                    <div style="font-size: 16px; color: #1f2937; font-weight: 600;">
+                        <?php echo htmlspecialchars($registro['titpro_id'] ?? 'N/A'); ?>
+                    </div>
+                </div>
+                
+                <div style="padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 8px;">Nombre del Título</div>
+                    <div style="font-size: 16px; color: #1f2937; font-weight: 600;">
+                        <?php echo htmlspecialchars($registro['titpro_nombre'] ?? 'N/A'); ?>
+                    </div>
+                </div>
             </div>
-            <div class="btn-group" style="margin-top: 20px;">
-                <a href="editar.php?id=<?php echo safeHtml($registro, 'titpro_id'); ?>" class="btn btn-primary">Editar</a>
-                <a href="index.php" class="btn btn-secondary">Volver</a>
+            
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+                <a href="/Gestion-sena/dashboard_sena/titulo_programa/index" class="btn btn-secondary">Volver</a>
+                <a href="/Gestion-sena/dashboard_sena/titulo_programa/editar?id=<?php echo htmlspecialchars($registro['titpro_id'] ?? ''); ?>" class="btn btn-primary">Editar</a>
             </div>
-        <?php else: ?>
-            <h2>Registro no encontrado</h2>
-            <p style="padding: 20px; text-align: center; color: #666;">No se encontró el título de programa solicitado.</p>
-            <div class="btn-group" style="margin-top: 20px; justify-content: center;">
-                <a href="index.php" class="btn btn-secondary">Volver al Listado</a>
-            </div>
-        <?php endif; ?>
+        </div>
     </div>
 </div>
 
-<?php include __DIR__ . '/../layout/footer.php'; ?>
+<script>
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>

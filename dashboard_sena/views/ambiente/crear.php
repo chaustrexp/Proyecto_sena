@@ -1,18 +1,4 @@
 <?php
-require_once __DIR__ . '/../../auth/check_auth.php';
-require_once __DIR__ . '/../../model/AmbienteModel.php';
-require_once __DIR__ . '/../../model/SedeModel.php';
-
-$model = new AmbienteModel();
-$sedeModel = new SedeModel();
-$sedes = $sedeModel->getAll();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $model->create($_POST);
-    header('Location: index.php?msg=creado');
-    exit;
-}
-
 $pageTitle = "Crear Ambiente";
 include __DIR__ . '/../layout/header.php';
 include __DIR__ . '/../layout/sidebar.php';
@@ -21,31 +7,77 @@ include __DIR__ . '/../layout/sidebar.php';
 <div class="main-content">
     <div class="form-container">
         <h2>Crear Nuevo Ambiente</h2>
-        <form method="POST">
+        
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-error">
+                <?php 
+                echo htmlspecialchars($_SESSION['error']); 
+                unset($_SESSION['error']);
+                ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($_SESSION['errors'])): ?>
+            <div class="alert alert-error">
+                <ul style="margin: 0; padding-left: 20px;">
+                    <?php foreach ($_SESSION['errors'] as $error): ?>
+                        <li><?php echo htmlspecialchars($error); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <?php unset($_SESSION['errors']); ?>
+        <?php endif; ?>
+        
+        <form method="POST" action="/Gestion-sena/dashboard_sena/ambiente/crear">
             <div class="form-group">
                 <label>Código del Ambiente * (Ej: A101, B205)</label>
-                <input type="text" name="amb_id" class="form-control" maxlength="5" placeholder="A101" required>
+                <input type="text" 
+                       name="codigo" 
+                       class="form-control" 
+                       maxlength="5" 
+                       placeholder="A101" 
+                       value="<?php echo isset($_SESSION['old_input']['codigo']) ? htmlspecialchars($_SESSION['old_input']['codigo']) : ''; ?>"
+                       required>
                 <small style="color: #6b7280;">Máximo 5 caracteres</small>
             </div>
+            
             <div class="form-group">
                 <label>Nombre del Ambiente *</label>
-                <input type="text" name="amb_nombre" class="form-control" maxlength="45" required>
+                <input type="text" 
+                       name="nombre" 
+                       class="form-control" 
+                       maxlength="45" 
+                       value="<?php echo isset($_SESSION['old_input']['nombre']) ? htmlspecialchars($_SESSION['old_input']['nombre']) : ''; ?>"
+                       required>
             </div>
+            
             <div class="form-group">
                 <label>Sede *</label>
-                <select name="SEDE_sede_id" class="form-control" required>
+                <select name="sede_id" class="form-control" required>
                     <option value="">Seleccione...</option>
-                    <?php foreach ($sedes as $sede): ?>
-                        <option value="<?php echo safeHtml($sede, 'sede_id'); ?>"><?php echo safeHtml($sede, 'sede_nombre'); ?></option>
-                    <?php endforeach; ?>
+                    <?php if (isset($sedes) && is_array($sedes)): ?>
+                        <?php foreach ($sedes as $sede): ?>
+                            <option value="<?php echo htmlspecialchars($sede['sede_id'] ?? ''); ?>"
+                                    <?php echo (isset($_SESSION['old_input']['sede_id']) && $_SESSION['old_input']['sede_id'] == $sede['sede_id']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($sede['sede_nombre'] ?? ''); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </select>
             </div>
+            
             <div class="btn-group">
                 <button type="submit" class="btn btn-primary">Guardar</button>
-                <a href="index.php" class="btn btn-secondary">Cancelar</a>
+                <a href="/Gestion-sena/dashboard_sena/ambiente/index" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
     </div>
 </div>
 
-<?php include __DIR__ . '/../layout/footer.php'; ?>
+<?php 
+// Limpiar old_input después de mostrar
+if (isset($_SESSION['old_input'])) {
+    unset($_SESSION['old_input']);
+}
+include __DIR__ . '/../layout/footer.php'; 
+?>

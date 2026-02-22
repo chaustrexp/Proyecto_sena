@@ -1,56 +1,76 @@
 <?php
-require_once __DIR__ . '/../../auth/check_auth.php';
-require_once __DIR__ . '/../../model/InstructorModel.php';
-
-$model = new InstructorModel();
-$id = safe($_GET, 'id', 0);
-$registro = $model->getById($id);
-
-$pageTitle = "Ver Instructor";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+// Vista de ver instructor
+// Los datos vienen del controlador: $pageTitle, $registro
 ?>
 
 <div class="main-content">
-    <div class="detail-card">
-        <?php if (registroValido($registro)): ?>
-            <h2>Detalle del Instructor</h2>
-            <div class="detail-row">
-                <div class="detail-label">ID:</div>
-                <div><?php echo safeHtml($registro, 'inst_id'); ?></div>
+    <div style="max-width: 700px; margin: 0 auto; padding: 32px;">
+        <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 32px;">
+            <div style="margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid #e5e7eb;">
+                <a href="/Gestion-sena/dashboard_sena/instructor/index" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; margin-bottom: 16px; font-size: 14px;">
+                    <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
+                    Volver a Instructores
+                </a>
+                <h1 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">Detalle del Instructor</h1>
+                <p style="font-size: 14px; color: #6b7280; margin: 0;">Información completa del instructor</p>
             </div>
-            <div class="detail-row">
-                <div class="detail-label">NOMBRES:</div>
-                <div><?php echo safeHtml($registro, 'inst_nombres'); ?></div>
+            
+            <div style="display: grid; gap: 24px;">
+                <div style="padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 8px;">ID</div>
+                    <div style="font-size: 16px; color: #1f2937; font-weight: 600;">
+                        <?php echo htmlspecialchars($registro['inst_id'] ?? 'N/A'); ?>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div style="padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 8px;">Nombres</div>
+                        <div style="font-size: 16px; color: #1f2937; font-weight: 600;">
+                            <?php echo htmlspecialchars($registro['inst_nombres'] ?? 'N/A'); ?>
+                        </div>
+                    </div>
+                    
+                    <div style="padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 8px;">Apellidos</div>
+                        <div style="font-size: 16px; color: #1f2937; font-weight: 600;">
+                            <?php echo htmlspecialchars($registro['inst_apellidos'] ?? 'N/A'); ?>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 8px;">Correo Electrónico</div>
+                    <div style="font-size: 16px; color: #1f2937; font-weight: 600;">
+                        <?php echo htmlspecialchars($registro['inst_correo'] ?? 'N/A'); ?>
+                    </div>
+                </div>
+                
+                <div style="padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 8px;">Teléfono</div>
+                    <div style="font-size: 16px; color: #1f2937; font-weight: 600;">
+                        <?php echo htmlspecialchars($registro['inst_telefono'] ?? 'N/A'); ?>
+                    </div>
+                </div>
+                
+                <div style="padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 8px;">Centro de Formación</div>
+                    <div style="font-size: 16px; color: #1f2937; font-weight: 600;">
+                        <?php echo htmlspecialchars($registro['cent_nombre'] ?? 'N/A'); ?>
+                    </div>
+                </div>
             </div>
-            <div class="detail-row">
-                <div class="detail-label">APELLIDOS:</div>
-                <div><?php echo safeHtml($registro, 'inst_apellidos'); ?></div>
+            
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+                <a href="/Gestion-sena/dashboard_sena/instructor/index" class="btn btn-secondary">Volver</a>
+                <a href="/Gestion-sena/dashboard_sena/instructor/editar?id=<?php echo htmlspecialchars($registro['inst_id'] ?? ''); ?>" class="btn btn-primary">Editar</a>
             </div>
-            <div class="detail-row">
-                <div class="detail-label">CORREO:</div>
-                <div><?php echo safeHtml($registro, 'inst_correo'); ?></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">TELÉFONO:</div>
-                <div><?php echo safeHtml($registro, 'inst_telefono'); ?></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">CENTRO DE FORMACIÓN:</div>
-                <div><?php echo safeHtml($registro, 'cent_nombre'); ?></div>
-            </div>
-            <div class="btn-group" style="margin-top: 20px;">
-                <a href="editar.php?id=<?php echo safeHtml($registro, 'inst_id'); ?>" class="btn btn-primary">Editar</a>
-                <a href="index.php" class="btn btn-secondary">Volver</a>
-            </div>
-        <?php else: ?>
-            <h2>Registro no encontrado</h2>
-            <p style="padding: 20px; text-align: center; color: #666;">No se encontró el instructor solicitado.</p>
-            <div class="btn-group" style="margin-top: 20px; justify-content: center;">
-                <a href="index.php" class="btn btn-secondary">Volver al Listado</a>
-            </div>
-        <?php endif; ?>
+        </div>
     </div>
 </div>
 
-<?php include __DIR__ . '/../layout/footer.php'; ?>
+<script>
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>

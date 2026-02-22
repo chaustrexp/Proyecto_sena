@@ -41,8 +41,8 @@ class CompetenciaProgramaModel {
             VALUES (?, ?)
         ");
         return $stmt->execute([
-            $data['PROGRAMA_prog_id'],
-            $data['COMPETENCIA_comp_id']
+            $data['programa_id'],
+            $data['competencia_id']
         ]);
     }
     

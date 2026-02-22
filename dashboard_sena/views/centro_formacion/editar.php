@@ -1,61 +1,74 @@
 <?php
-require_once __DIR__ . '/../../auth/check_auth.php';
-require_once __DIR__ . '/../../model/CentroFormacionModel.php';
-
-$model = new CentroFormacionModel();
-
-$id = safe($_GET, 'id', 0);
-
-if (!$id) {
-    header('Location: index.php');
-    exit;
-}
-
-$registro = $model->getById($id);
-
-// Verificar si el registro existe
-if (!registroValido($registro)) {
-    $_SESSION['error'] = 'Centro de Formación no encontrado';
-    header('Location: index.php');
-    exit;
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $model->update($id, $_POST);
-    header('Location: index.php?msg=actualizado');
-    exit;
-}
-
-$pageTitle = "Editar Centro de Formación";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+// Esta vista es renderizada por el controlador
+$registro = $data['registro'] ?? null;
 ?>
 
 <div class="main-content">
-    <div class="form-container">
-        <h2>Editar Centro de Formación</h2>
-        <form method="POST">
-            <div class="form-group">
-                <label>Nombre *</label>
-                <input type="text" name="nombre" class="form-control" value="<?php echo safeHtml($registro, 'cent_nombre'); ?>" required>
+    <div style="max-width: 800px; margin: 0 auto; padding: 32px;">
+        <!-- Header -->
+        <div style="margin-bottom: 32px;">
+            <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0 0 8px;">Editar Centro de Formación</h1>
+            <p style="font-size: 14px; color: #6b7280; margin: 0;">Actualiza la información del centro</p>
+        </div>
+
+        <!-- Alert de Error -->
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger" style="margin-bottom: 24px;">
+                <?php 
+                echo $_SESSION['error'];
+                unset($_SESSION['error']);
+                ?>
             </div>
-            
-            <div class="form-group">
-                <label>Dirección</label>
-                <input type="text" name="direccion" class="form-control" value="<?php echo safeHtml($registro, 'cent_direccion'); ?>">
-            </div>
-            
-            <div class="form-group">
-                <label>Teléfono</label>
-                <input type="text" name="telefono" class="form-control" value="<?php echo safeHtml($registro, 'cent_telefono'); ?>">
-            </div>
-            
-            <div class="btn-group">
-                <button type="submit" class="btn btn-primary">Actualizar</button>
-                <a href="index.php" class="btn btn-secondary">Cancelar</a>
-            </div>
-        </form>
+        <?php endif; ?>
+
+        <!-- Formulario -->
+        <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 32px;">
+            <form method="POST" action="/Gestion-sena/dashboard_sena/centro_formacion/editar/<?php echo $registro['cent_id']; ?>">
+                <input type="hidden" name="_action" value="update">
+                
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                        ID del Centro
+                    </label>
+                    <input 
+                        type="text" 
+                        value="<?php echo htmlspecialchars($registro['cent_id']); ?>" 
+                        disabled
+                        style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #f9fafb; color: #6b7280;"
+                    >
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                        Nombre del Centro <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="cent_nombre" 
+                        class="form-control" 
+                        value="<?php echo htmlspecialchars($registro['cent_nombre']); ?>"
+                        required
+                        style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;"
+                    >
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+                    <a href="/Gestion-sena/dashboard_sena/centro_formacion/index" class="btn btn-secondary">
+                        <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                        Actualizar Centro
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<?php include __DIR__ . '/../layout/footer.php'; ?>
+<script>
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>

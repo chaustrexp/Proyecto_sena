@@ -449,7 +449,7 @@
                     <!-- Footer -->
                     <div style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px;">
                         <button onclick="document.getElementById('modalDia').remove()" class="btn btn-secondary">Cerrar</button>
-                        <a href="/Gestion-sena/dashboard_sena/views/asignacion/index.php" class="btn btn-primary">Ver Todas</a>
+                        <a href="/Gestion-sena/dashboard_sena/asignacion/index" class="btn btn-primary">Ver Todas</a>
                     </div>
                 </div>
             </div>
@@ -549,8 +549,8 @@
                             <div style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; gap: 12px;">
                                 <button onclick="document.getElementById('modalDetalle').remove()" class="btn btn-secondary">Cerrar</button>
                                 <div style="display: flex; gap: 8px;">
-                                    <a href="/Gestion-sena/dashboard_sena/views/asignacion/ver.php?id=${data.id}" class="btn btn-secondary btn-sm">Ver Completo</a>
-                                    <a href="/Gestion-sena/dashboard_sena/views/asignacion/editar.php?id=${data.id}" class="btn btn-primary btn-sm">Editar</a>
+                                    <a href="/Gestion-sena/dashboard_sena/asignacion/show/${data.id}" class="btn btn-secondary btn-sm">Ver Completo</a>
+                                    <a href="/Gestion-sena/dashboard_sena/asignacion/edit/${data.id}" class="btn btn-primary btn-sm">Editar</a>
                                 </div>
                             </div>
                         </div>

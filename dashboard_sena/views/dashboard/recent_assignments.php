@@ -7,7 +7,7 @@
                 <h2 style="font-size: 18px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">Últimas Asignaciones</h2>
                 <p style="font-size: 13px; color: #6b7280; margin: 0;">Asignaciones recientes del sistema</p>
             </div>
-            <a href="/Gestion-sena/dashboard_sena/views/asignacion/index.php" class="btn btn-secondary btn-sm">
+            <a href="/Gestion-sena/dashboard_sena/asignacion/index" class="btn btn-secondary btn-sm">
                 Ver todas
             </a>
         </div>

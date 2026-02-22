@@ -1,19 +1,5 @@
 <?php
-require_once __DIR__ . '/../../auth/check_auth.php';
-require_once __DIR__ . '/../../model/CoordinacionModel.php';
-
-$model = new CoordinacionModel();
-
-if (isset($_GET['eliminar'])) {
-    $model->delete($_GET['eliminar']);
-    header('Location: index.php?msg=eliminado');
-    exit;
-}
-
-$registros = $model->getAll();
-$pageTitle = "Gestión de Coordinaciones";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+$registros = $data['registros'] ?? [];
 ?>
 
 <div class="main-content">
@@ -23,19 +9,27 @@ include __DIR__ . '/../layout/sidebar.php';
             <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">Coordinaciones</h1>
             <p style="font-size: 14px; color: #6b7280; margin: 0;">Gestiona las coordinaciones académicas</p>
         </div>
-        <a href="crear.php" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+        <a href="/Gestion-sena/dashboard_sena/coordinacion/crear" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
             <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
             Nueva Coordinación
         </a>
     </div>
 
     <!-- Alert -->
-    <?php if (isset($_GET['msg'])): ?>
+    <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success" style="margin: 24px 32px;">
             <?php 
-            if ($_GET['msg'] == 'creado') echo '✓ Coordinación creada exitosamente';
-            if ($_GET['msg'] == 'actualizado') echo '✓ Coordinación actualizada exitosamente';
-            if ($_GET['msg'] == 'eliminado') echo '✓ Coordinación eliminada exitosamente';
+            echo $_SESSION['success'];
+            unset($_SESSION['success']);
+            ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger" style="margin: 24px 32px;">
+            <?php 
+            echo $_SESSION['error'];
+            unset($_SESSION['error']);
             ?>
         </div>
     <?php endif; ?>
@@ -72,7 +66,7 @@ include __DIR__ . '/../layout/sidebar.php';
                         <td colspan="4" style="text-align: center; padding: 60px 20px; color: #6b7280;">
                             <div style="font-size: 48px; margin-bottom: 16px;">🎯</div>
                             <p style="margin: 0 0 16px; font-size: 16px;">No hay coordinaciones registradas</p>
-                            <a href="crear.php" class="btn btn-primary btn-sm">Crear Primera Coordinación</a>
+                            <a href="/Gestion-sena/dashboard_sena/coordinacion/crear" class="btn btn-primary btn-sm">Crear Primera Coordinación</a>
                         </td>
                     </tr>
                     <?php else: ?>
@@ -91,9 +85,9 @@ include __DIR__ . '/../layout/sidebar.php';
                             </td>
                             <td style="padding: 16px;">
                                 <div class="btn-group" style="justify-content: flex-end;">
-                                    <a href="ver.php?id=<?php echo $registro['coord_id']; ?>" class="btn btn-secondary btn-sm">Ver</a>
-                                    <a href="editar.php?id=<?php echo $registro['coord_id']; ?>" class="btn btn-primary btn-sm">Editar</a>
-                                    <button onclick="confirmarEliminacion(<?php echo $registro['coord_id']; ?>, 'coordinacion')" class="btn btn-danger btn-sm">Eliminar</button>
+                                    <a href="/Gestion-sena/dashboard_sena/coordinacion/ver/<?php echo $registro['coord_id']; ?>" class="btn btn-secondary btn-sm">Ver</a>
+                                    <a href="/Gestion-sena/dashboard_sena/coordinacion/editar/<?php echo $registro['coord_id']; ?>" class="btn btn-primary btn-sm">Editar</a>
+                                    <a href="/Gestion-sena/dashboard_sena/coordinacion/eliminar/<?php echo $registro['coord_id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar esta coordinación?')">Eliminar</a>
                                 </div>
                             </td>
                         </tr>
@@ -109,17 +103,6 @@ include __DIR__ . '/../layout/sidebar.php';
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
-    
-    document.querySelectorAll('tbody tr').forEach(row => {
-        if (row.cells.length > 1) {
-            row.addEventListener('mouseenter', function() {
-                this.style.background = '#f9fafb';
-            });
-            row.addEventListener('mouseleave', function() {
-                this.style.background = 'white';
-            });
-        }
-    });
 </script>
 
 <?php include __DIR__ . '/../layout/footer.php'; ?>

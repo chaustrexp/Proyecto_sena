@@ -27,6 +27,28 @@ $module = $parts[0] ?? 'dashboard';
 $action = $parts[1] ?? 'index';
 $id = $parts[2] ?? null;
 
+// Limpiar .php del módulo si existe
+if (str_ends_with($module, '.php')) {
+    $module = str_replace('.php', '', $module);
+}
+
+// Limpiar .php de la acción si existe (crear.php, editar.php, index.php, etc.)
+if (str_ends_with($action, '.php')) {
+    $action = str_replace('.php', '', $action);
+}
+
+// Si solo viene el módulo sin acción, redirigir a módulo/index
+if (empty($parts[1]) && !empty($module) && $module !== 'dashboard') {
+    header("Location: {$basePath}{$module}/index");
+    exit;
+}
+
+// Si es dashboard sin acción, redirigir a dashboard/index
+if ($module === 'dashboard' && empty($parts[1])) {
+    header("Location: {$basePath}dashboard/index");
+    exit;
+}
+
 // Manejar acciones POST especiales
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Si viene de un formulario de crear, la acción es store
@@ -47,12 +69,19 @@ $routes = [
     'dashboard' => [
         'controller' => 'DashboardController',
         'file' => 'controller/DashboardController.php',
-        'actions' => ['index']
+        'actions' => ['index'],
+        'default_action' => 'index' // Siempre redirigir a index
     ],
     'asignacion' => [
         'controller' => 'AsignacionController',
         'file' => 'controller/AsignacionController.php',
-        'actions' => ['index', 'create', 'store', 'show', 'edit', 'update', 'delete']
+        'actions' => ['index', 'crear', 'store', 'ver', 'editar', 'update', 'eliminar'],
+        'action_map' => [
+            'create' => 'crear',
+            'show' => 'ver',
+            'edit' => 'editar',
+            'delete' => 'eliminar'
+        ]
     ],
     'ficha' => [
         'controller' => 'FichaController',
@@ -62,12 +91,24 @@ $routes = [
     'instructor' => [
         'controller' => 'InstructorController',
         'file' => 'controller/InstructorController.php',
-        'actions' => ['index', 'create', 'store', 'show', 'edit', 'update', 'delete']
+        'actions' => ['index', 'crear', 'store', 'ver', 'editar', 'update', 'eliminar'],
+        'action_map' => [
+            'create' => 'crear',
+            'show' => 'ver',
+            'edit' => 'editar',
+            'delete' => 'eliminar'
+        ]
     ],
     'ambiente' => [
         'controller' => 'AmbienteController',
         'file' => 'controller/AmbienteController.php',
-        'actions' => ['index', 'create', 'store', 'show', 'edit', 'update', 'delete']
+        'actions' => ['index', 'crear', 'store', 'ver', 'editar', 'update', 'eliminar'],
+        'action_map' => [
+            'create' => 'crear',
+            'show' => 'ver',
+            'edit' => 'editar',
+            'delete' => 'eliminar'
+        ]
     ],
     'programa' => [
         'controller' => 'ProgramaController',
@@ -77,7 +118,88 @@ $routes = [
     'competencia' => [
         'controller' => 'CompetenciaController',
         'file' => 'controller/CompetenciaController.php',
-        'actions' => ['index', 'create', 'store', 'show', 'edit', 'update', 'delete']
+        'actions' => ['index', 'crear', 'store', 'ver', 'editar', 'update', 'eliminar'],
+        'action_map' => [
+            'create' => 'crear',
+            'show' => 'ver',
+            'edit' => 'editar',
+            'delete' => 'eliminar'
+        ]
+    ],
+    'competencia_programa' => [
+        'controller' => 'CompetenciaProgramaController',
+        'file' => 'controller/CompetenciaProgramaController.php',
+        'actions' => ['index', 'crear', 'store', 'eliminar'],
+        'action_map' => [
+            'create' => 'crear',
+            'delete' => 'eliminar'
+        ]
+    ],
+    'titulo_programa' => [
+        'controller' => 'TituloProgramaController',
+        'file' => 'controller/TituloProgramaController.php',
+        'actions' => ['index', 'crear', 'store', 'ver', 'editar', 'update', 'eliminar'],
+        'action_map' => [
+            'create' => 'crear',
+            'show' => 'ver',
+            'edit' => 'editar',
+            'delete' => 'eliminar'
+        ]
+    ],
+    'instru_competencia' => [
+        'controller' => 'InstruCompetenciaController',
+        'file' => 'controller/InstruCompetenciaController.php',
+        'actions' => ['index', 'crear', 'store', 'ver', 'editar', 'update', 'eliminar'],
+        'action_map' => [
+            'create' => 'crear',
+            'show' => 'ver',
+            'edit' => 'editar',
+            'delete' => 'eliminar'
+        ]
+    ],
+    'detalle_asignacion' => [
+        'controller' => 'DetalleAsignacionController',
+        'file' => 'controller/DetalleAsignacionController.php',
+        'actions' => ['index', 'crear', 'store', 'ver', 'editar', 'update', 'eliminar'],
+        'action_map' => [
+            'create' => 'crear',
+            'show' => 'ver',
+            'edit' => 'editar',
+            'delete' => 'eliminar'
+        ]
+    ],
+    'centro_formacion' => [
+        'controller' => 'CentroFormacionController',
+        'file' => 'controller/CentroFormacionController.php',
+        'actions' => ['index', 'crear', 'store', 'ver', 'editar', 'update', 'eliminar'],
+        'action_map' => [
+            'create' => 'crear',
+            'show' => 'ver',
+            'edit' => 'editar',
+            'delete' => 'eliminar'
+        ]
+    ],
+    'coordinacion' => [
+        'controller' => 'CoordinacionController',
+        'file' => 'controller/CoordinacionController.php',
+        'actions' => ['index', 'crear', 'store', 'ver', 'editar', 'update', 'eliminar'],
+        'action_map' => [
+            'create' => 'crear',
+            'show' => 'ver',
+            'edit' => 'editar',
+            'delete' => 'eliminar'
+        ]
+    ],
+    'sede' => [
+        'controller' => 'SedeController',
+        'file' => 'controller/SedeController.php',
+        'actions' => ['index', 'crear', 'store', 'ver', 'editar', 'update', 'eliminar'],
+        'action_map' => [
+            'create' => 'crear',
+            'show' => 'ver',
+            'edit' => 'editar',
+            'delete' => 'eliminar'
+        ]
     ]
 ];
 
@@ -89,10 +211,21 @@ if (!isset($routes[$module])) {
 
 $routeConfig = $routes[$module];
 
+// Mapear acción si existe un mapeo (inglés -> español)
+if (isset($routeConfig['action_map'][$action])) {
+    $action = $routeConfig['action_map'][$action];
+}
+
+// Si el módulo tiene una acción por defecto y la acción solicitada no es válida, usar la por defecto
+if (isset($routeConfig['default_action']) && !in_array($action, $routeConfig['actions'])) {
+    $action = $routeConfig['default_action'];
+    $id = null;
+}
+
 // Verificar si la acción es válida
 if (!in_array($action, $routeConfig['actions'])) {
     http_response_code(404);
-    die("Acción no encontrada: $action");
+    die("Acción no encontrada: $action en módulo $module");
 }
 
 // Cargar el controlador

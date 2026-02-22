@@ -1,76 +1,139 @@
 <?php
-require_once __DIR__ . '/../../auth/check_auth.php';
-require_once __DIR__ . '/../../model/CoordinacionModel.php';
-require_once __DIR__ . '/../../model/CentroFormacionModel.php';
-
-$model = new CoordinacionModel();
-$centroModel = new CentroFormacionModel();
-$centros = $centroModel->getAll();
-
-$id = safe($_GET, 'id', 0);
-
-if (!$id) {
-    header('Location: index.php');
-    exit;
-}
-
-$registro = $model->getById($id);
-
-// Verificar si el registro existe
-if (!registroValido($registro)) {
-    $_SESSION['error'] = 'Coordinación no encontrada';
-    header('Location: index.php');
-    exit;
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $model->update($id, $_POST);
-    header('Location: index.php?msg=actualizado');
-    exit;
-}
-
-$pageTitle = "Editar Coordinación";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+// Esta vista es renderizada por el controlador
+$registro = $data['registro'] ?? null;
+$centros = $data['centros'] ?? [];
 ?>
 
 <div class="main-content">
-    <div class="form-container">
-        <h2>Editar Coordinación</h2>
-        <form method="POST">
-            <div class="form-group">
-                <label>Descripción *</label>
-                <input type="text" name="descripcion" class="form-control" value="<?php echo safeHtml($registro, 'coord_descripcion'); ?>" required>
+    <div style="max-width: 800px; margin: 0 auto; padding: 32px;">
+        <!-- Header -->
+        <div style="margin-bottom: 32px;">
+            <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0 0 8px;">Editar Coordinación</h1>
+            <p style="font-size: 14px; color: #6b7280; margin: 0;">Actualiza la información de la coordinación</p>
+        </div>
+
+        <!-- Alert de Error -->
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger" style="margin-bottom: 24px;">
+                <?php 
+                echo $_SESSION['error'];
+                unset($_SESSION['error']);
+                ?>
             </div>
-            
-            <div class="form-group">
-                <label>Nombre Coordinador</label>
-                <input type="text" name="nombre_coordinador" class="form-control" value="<?php echo safeHtml($registro, 'coord_nombre_coordinador'); ?>">
-            </div>
-            
-            <div class="form-group">
-                <label>Correo</label>
-                <input type="email" name="correo" class="form-control" value="<?php echo safeHtml($registro, 'coord_correo'); ?>">
-            </div>
-            
-            <div class="form-group">
-                <label>Centro de Formación</label>
-                <select name="centro_formacion_id" class="form-control">
-                    <option value="">Seleccione...</option>
-                    <?php foreach ($centros as $centro): ?>
-                        <option value="<?php echo safeHtml($centro, 'cent_id'); ?>" 
-                                <?php echo (safe($registro, 'CENTROFORMACION_cent_id') == safe($centro, 'cent_id')) ? 'selected' : ''; ?>>
-                            <?php echo safeHtml($centro, 'cent_nombre'); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="btn-group">
-                <button type="submit" class="btn btn-primary">Actualizar</button>
-                <a href="index.php" class="btn btn-secondary">Cancelar</a>
-            </div>
-        </form>
+        <?php endif; ?>
+
+        <!-- Formulario -->
+        <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 32px;">
+            <form method="POST" action="/Gestion-sena/dashboard_sena/coordinacion/editar/<?php echo $registro['coord_id']; ?>">
+                <input type="hidden" name="_action" value="update">
+                
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                        ID de la Coordinación
+                    </label>
+                    <input 
+                        type="text" 
+                        value="<?php echo htmlspecialchars($registro['coord_id']); ?>" 
+                        disabled
+                        style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #f9fafb; color: #6b7280;"
+                    >
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                        Descripción <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="coord_descripcion" 
+                        class="form-control" 
+                        value="<?php echo htmlspecialchars($registro['coord_descripcion']); ?>"
+                        required
+                        style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;"
+                    >
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                        Centro de Formación <span style="color: #ef4444;">*</span>
+                    </label>
+                    <select 
+                        name="CENTRO_FORMACION_cent_id" 
+                        class="form-control" 
+                        required
+                        style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;"
+                    >
+                        <option value="">Seleccione un centro</option>
+                        <?php foreach ($centros as $centro): ?>
+                            <option value="<?php echo $centro['cent_id']; ?>" 
+                                <?php echo ($registro['CENTRO_FORMACION_cent_id'] == $centro['cent_id']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($centro['cent_nombre']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                        Nombre del Coordinador <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="coord_nombre_coordinador" 
+                        class="form-control" 
+                        value="<?php echo htmlspecialchars($registro['coord_nombre_coordinador']); ?>"
+                        required
+                        style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;"
+                    >
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                        Correo Electrónico <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        name="coord_correo" 
+                        class="form-control" 
+                        value="<?php echo htmlspecialchars($registro['coord_correo']); ?>"
+                        required
+                        style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;"
+                    >
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                        Nueva Contraseña
+                    </label>
+                    <input 
+                        type="password" 
+                        name="coord_password" 
+                        class="form-control" 
+                        style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;"
+                        placeholder="Dejar vacío para mantener la contraseña actual"
+                    >
+                    <small style="color: #6b7280; font-size: 12px; margin-top: 4px; display: block;">
+                        Solo completa este campo si deseas cambiar la contraseña
+                    </small>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+                    <a href="/Gestion-sena/dashboard_sena/coordinacion/index" class="btn btn-secondary">
+                        <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                        Actualizar Coordinación
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<?php include __DIR__ . '/../layout/footer.php'; ?>
+<script>
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>

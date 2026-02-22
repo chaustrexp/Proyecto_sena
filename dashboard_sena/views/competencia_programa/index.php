@@ -1,23 +1,6 @@
 <?php
-require_once __DIR__ . '/../../auth/check_auth.php';
-require_once __DIR__ . '/../../model/CompetenciaProgramaModel.php';
-
-$model = new CompetenciaProgramaModel();
-
-if (isset($_GET['eliminar'])) {
-    // Formato: prog_id_comp_id
-    $ids = explode('_', $_GET['eliminar']);
-    if (count($ids) == 2) {
-        $model->delete($ids[0], $ids[1]);
-    }
-    header('Location: index.php?msg=eliminado');
-    exit;
-}
-
-$registros = $model->getAll();
-$pageTitle = "Gestión de Competencia-Programa";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+// Vista de index competencia_programa
+// Los datos vienen del controlador: $pageTitle, $registros, $totalRelaciones, $mensaje
 ?>
 
 <div class="main-content">
@@ -27,20 +10,28 @@ include __DIR__ . '/../layout/sidebar.php';
             <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">Competencias por Programa</h1>
             <p style="font-size: 14px; color: #6b7280; margin: 0;">Gestiona la relación entre competencias y programas</p>
         </div>
-        <a href="crear.php" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+        <a href="/Gestion-sena/dashboard_sena/competencia_programa/crear" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
             <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
             Nueva Relación
         </a>
     </div>
 
-    <!-- Alert -->
-    <?php if (isset($_GET['msg'])): ?>
+    <!-- Alert Messages -->
+    <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success" style="margin: 24px 32px;">
-            <?php 
-            if ($_GET['msg'] == 'creado') echo '✓ Relación creada exitosamente';
-            if ($_GET['msg'] == 'actualizado') echo '✓ Relación actualizada exitosamente';
-            if ($_GET['msg'] == 'eliminado') echo '✓ Relación eliminada exitosamente';
-            ?>
+            ✓ <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-error" style="margin: 24px 32px;">
+            ✗ <?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php if (isset($mensaje)): ?>
+        <div class="alert alert-success" style="margin: 24px 32px;">
+            ✓ <?php echo htmlspecialchars($mensaje); ?>
         </div>
     <?php endif; ?>
 
@@ -48,12 +39,12 @@ include __DIR__ . '/../layout/sidebar.php';
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 24px 32px;">
         <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
             <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Total Relaciones</div>
-            <div style="font-size: 32px; font-weight: 700; color: #6366f1;"><?php echo count($registros); ?></div>
+            <div style="font-size: 32px; font-weight: 700; color: #6366f1;"><?php echo $totalRelaciones ?? count($registros ?? []); ?></div>
         </div>
         <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
             <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Programas Vinculados</div>
             <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">
-                <?php echo count(array_unique(array_column($registros, 'PROGRAMA_prog_id'))); ?>
+                <?php echo isset($registros) && !empty($registros) ? count(array_unique(array_column($registros, 'PROGRAMA_prog_id'))) : 0; ?>
             </div>
         </div>
     </div>
@@ -67,7 +58,7 @@ include __DIR__ . '/../layout/sidebar.php';
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Competencia</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Programa</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; width: 120px;">Estado</th>
-                        <th style="padding: 16px; text-align: right; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; width: 200px;">Acciones</th>
+                        <th style="padding: 16px; text-align: right; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; width: 150px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,7 +67,7 @@ include __DIR__ . '/../layout/sidebar.php';
                         <td colspan="4" style="text-align: center; padding: 60px 20px; color: #6b7280;">
                             <div style="font-size: 48px; margin-bottom: 16px;">🔗</div>
                             <p style="margin: 0 0 16px; font-size: 16px;">No hay relaciones registradas</p>
-                            <a href="crear.php" class="btn btn-primary btn-sm">Crear Primera Relación</a>
+                            <a href="/Gestion-sena/dashboard_sena/competencia_programa/crear" class="btn btn-primary btn-sm">Crear Primera Relación</a>
                         </td>
                     </tr>
                     <?php else: ?>
@@ -95,14 +86,13 @@ include __DIR__ . '/../layout/sidebar.php';
                                 </div>
                             </td>
                             <td style="padding: 16px;">
-                                <span style="background: #EFF6FF; color: #3b82f6; padding: 6px 12px; border-radius: 12px; font-size: 14px; font-weight: 700;">
-                                    Relación
+                                <span style="background: #EFF6FF; color: #3b82f6; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                    Activa
                                 </span>
                             </td>
                             <td style="padding: 16px;">
                                 <div class="btn-group" style="justify-content: flex-end;">
-                                    <a href="ver.php?prog_id=<?php echo $registro['PROGRAMA_prog_id']; ?>&comp_id=<?php echo $registro['COMPETENCIA_comp_id']; ?>" class="btn btn-secondary btn-sm">Ver</a>
-                                    <button onclick="if(confirm('¿Eliminar esta relación?')) window.location.href='index.php?eliminar=<?php echo $registro['PROGRAMA_prog_id']; ?>_<?php echo $registro['COMPETENCIA_comp_id']; ?>'" class="btn btn-danger btn-sm">Eliminar</button>
+                                    <button onclick="confirmarEliminacion('<?php echo htmlspecialchars($registro['PROGRAMA_prog_id'] ?? ''); ?>', '<?php echo htmlspecialchars($registro['COMPETENCIA_comp_id'] ?? ''); ?>')" class="btn btn-danger btn-sm">Eliminar</button>
                                 </div>
                             </td>
                         </tr>
@@ -129,6 +119,10 @@ include __DIR__ . '/../layout/sidebar.php';
             });
         }
     });
+    
+    function confirmarEliminacion(programaId, competenciaId) {
+        if (confirm('¿Está seguro de eliminar esta relación?')) {
+            window.location.href = `/Gestion-sena/dashboard_sena/competencia_programa/eliminar?programa_id=${programaId}&competencia_id=${competenciaId}`;
+        }
+    }
 </script>
-
-<?php include __DIR__ . '/../layout/footer.php'; ?>

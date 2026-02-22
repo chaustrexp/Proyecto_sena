@@ -92,23 +92,23 @@ $documentTitle = $pageTitle . ' - Dashboard SENA';
                 
                 <!-- Dropdown Agregar -->
                 <div class="add-dropdown" id="addDropdown">
-                    <a href="/Gestion-sena/dashboard_sena/views/asignacion/crear.php" class="add-dropdown-item">
+                    <a href="/Gestion-sena/dashboard_sena/asignacion/create" class="add-dropdown-item">
                         <i data-lucide="calendar"></i>
                         Nueva Asignación
                     </a>
-                    <a href="/Gestion-sena/dashboard_sena/views/instructor/crear.php" class="add-dropdown-item">
+                    <a href="/Gestion-sena/dashboard_sena/instructor/create" class="add-dropdown-item">
                         <i data-lucide="user-plus"></i>
                         Nuevo Instructor
                     </a>
-                    <a href="/Gestion-sena/dashboard_sena/views/ficha/crear.php" class="add-dropdown-item">
+                    <a href="/Gestion-sena/dashboard_sena/ficha/create" class="add-dropdown-item">
                         <i data-lucide="file-plus"></i>
                         Nueva Ficha
                     </a>
-                    <a href="/Gestion-sena/dashboard_sena/views/programa/crear.php" class="add-dropdown-item">
+                    <a href="/Gestion-sena/dashboard_sena/programa/create" class="add-dropdown-item">
                         <i data-lucide="book-open"></i>
                         Nuevo Programa
                     </a>
-                    <a href="/Gestion-sena/dashboard_sena/views/ambiente/crear.php" class="add-dropdown-item">
+                    <a href="/Gestion-sena/dashboard_sena/ambiente/create" class="add-dropdown-item">
                         <i data-lucide="map-pin"></i>
                         Nuevo Ambiente
                     </a>

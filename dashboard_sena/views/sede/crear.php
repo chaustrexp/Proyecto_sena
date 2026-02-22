@@ -1,34 +1,61 @@
-<?php 
-require_once __DIR__ . '/../../auth/check_auth.php';
-require_once __DIR__ . '/../../model/SedeModel.php';
-
-$model = new SedeModel();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $model->create($_POST);
-    header('Location: index.php?msg=creado');
-    exit;
-}
-
-$pageTitle = "Crear Sede";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+<?php
+// Esta vista es renderizada por el controlador
 ?>
 
 <div class="main-content">
-    <div class="form-container">
-        <h2>Crear Nueva Sede</h2>
-        <form method="POST">
-            <div class="form-group">
-                <label>Nombre de la Sede *</label>
-                <input type="text" name="sede_nombre" class="form-control" maxlength="45" required>
+    <div style="max-width: 800px; margin: 0 auto; padding: 32px;">
+        <!-- Header -->
+        <div style="margin-bottom: 32px;">
+            <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0 0 8px;">Nueva Sede</h1>
+            <p style="font-size: 14px; color: #6b7280; margin: 0;">Completa el formulario para crear una nueva sede</p>
+        </div>
+
+        <!-- Alert de Error -->
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger" style="margin-bottom: 24px;">
+                <?php 
+                echo $_SESSION['error'];
+                unset($_SESSION['error']);
+                ?>
             </div>
-            <div class="btn-group">
-                <button type="submit" class="btn btn-primary">Guardar</button>
-                <a href="index.php" class="btn btn-secondary">Cancelar</a>
-            </div>
-        </form>
+        <?php endif; ?>
+
+        <!-- Formulario -->
+        <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 32px;">
+            <form method="POST" action="/Gestion-sena/dashboard_sena/sede/crear">
+                <input type="hidden" name="_action" value="store">
+                
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                        Nombre de la Sede <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="sede_nombre" 
+                        class="form-control" 
+                        required
+                        style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;"
+                        placeholder="Ej: Sede Norte"
+                    >
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+                    <a href="/Gestion-sena/dashboard_sena/sede/index" class="btn btn-secondary">
+                        <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                        Guardar Sede
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<?php include __DIR__ . '/../layout/footer.php'; ?>
+<script>
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>

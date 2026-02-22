@@ -1,30 +1,13 @@
 <?php
-require_once __DIR__ . '/../../auth/check_auth.php';
-require_once __DIR__ . '/../../model/InstructorModel.php';
-require_once __DIR__ . '/../../model/CentroFormacionModel.php';
-
-$model = new InstructorModel();
-$centroModel = new CentroFormacionModel();
-$centros = $centroModel->getAll();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $model->create($_POST);
-    header('Location: index.php?msg=creado');
-    exit;
-}
-
-$pageTitle = "Crear Instructor";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+// Vista de crear instructor
+// Los datos vienen del controlador: $pageTitle, $centros
 ?>
 
 <div class="main-content">
-    <!-- Form -->
     <div style="max-width: 700px; margin: 0 auto; padding: 32px;">
         <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 32px;">
-            <!-- Header -->
             <div style="margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid #e5e7eb;">
-                <a href="index.php" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; margin-bottom: 16px; font-size: 14px; transition: color 0.2s;">
+                <a href="/Gestion-sena/dashboard_sena/instructor/index" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; margin-bottom: 16px; font-size: 14px;">
                     <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
                     Volver a Instructores
                 </a>
@@ -32,36 +15,77 @@ include __DIR__ . '/../layout/sidebar.php';
                 <p style="font-size: 14px; color: #6b7280; margin: 0;">Complete la información del instructor</p>
             </div>
             
-            <form method="POST">
-                <div class="form-row">
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-error" style="margin-bottom: 24px;">
+                    ✗ <?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
+                </div>
+            <?php endif; ?>
+            
+            <?php if (isset($_SESSION['errors'])): ?>
+                <div class="alert alert-error" style="margin-bottom: 24px;">
+                    <strong>Por favor corrija los siguientes errores:</strong>
+                    <ul style="margin: 8px 0 0; padding-left: 20px;">
+                        <?php foreach ($_SESSION['errors'] as $error): ?>
+                            <li><?php echo htmlspecialchars($error); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+                <?php unset($_SESSION['errors']); ?>
+            <?php endif; ?>
+            
+            <form method="POST" action="/Gestion-sena/dashboard_sena/instructor/crear">
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div class="form-group">
                         <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">
                             Nombres <span style="color: #ef4444;">*</span>
                         </label>
-                        <input type="text" name="inst_nombres" class="form-control" required placeholder="Ej: Juan Carlos" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                        <input type="text" 
+                               name="inst_nombres" 
+                               class="form-control" 
+                               required 
+                               placeholder="Ej: Juan Carlos"
+                               value="<?php echo isset($_SESSION['old_input']['inst_nombres']) ? htmlspecialchars($_SESSION['old_input']['inst_nombres']) : ''; ?>"
+                               style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
                     </div>
                     
                     <div class="form-group">
                         <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">
                             Apellidos <span style="color: #ef4444;">*</span>
                         </label>
-                        <input type="text" name="inst_apellidos" class="form-control" required placeholder="Ej: Pérez García" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                        <input type="text" 
+                               name="inst_apellidos" 
+                               class="form-control" 
+                               required 
+                               placeholder="Ej: Pérez García"
+                               value="<?php echo isset($_SESSION['old_input']['inst_apellidos']) ? htmlspecialchars($_SESSION['old_input']['inst_apellidos']) : ''; ?>"
+                               style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
                     </div>
                 </div>
 
-                <div class="form-row">
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div class="form-group">
                         <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">
                             Correo Electrónico <span style="color: #ef4444;">*</span>
                         </label>
-                        <input type="email" name="inst_correo" class="form-control" required placeholder="Ej: juan.perez@sena.edu.co" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                        <input type="email" 
+                               name="inst_correo" 
+                               class="form-control" 
+                               required 
+                               placeholder="Ej: juan.perez@sena.edu.co"
+                               value="<?php echo isset($_SESSION['old_input']['inst_correo']) ? htmlspecialchars($_SESSION['old_input']['inst_correo']) : ''; ?>"
+                               style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
                     </div>
                     
                     <div class="form-group">
                         <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">
-                            Teléfono <span style="color: #ef4444;">*</span>
+                            Teléfono
                         </label>
-                        <input type="number" name="inst_telefono" class="form-control" required placeholder="Ej: 3001234567" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                        <input type="text" 
+                               name="inst_telefono" 
+                               class="form-control" 
+                               placeholder="Ej: 3001234567"
+                               value="<?php echo isset($_SESSION['old_input']['inst_telefono']) ? htmlspecialchars($_SESSION['old_input']['inst_telefono']) : ''; ?>"
+                               style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
                     </div>
                 </div>
 
@@ -69,13 +93,19 @@ include __DIR__ . '/../layout/sidebar.php';
                     <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">
                         Centro de Formación <span style="color: #ef4444;">*</span>
                     </label>
-                    <select name="CENTRO_FORMACION_cent_id" class="form-control" required style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                    <select name="CENTRO_FORMACION_cent_id" 
+                            class="form-control" 
+                            required 
+                            style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
                         <option value="">Seleccione un centro...</option>
-                        <?php foreach ($centros as $centro): ?>
-                            <option value="<?php echo $centro['cent_id']; ?>">
-                                <?php echo htmlspecialchars($centro['cent_nombre']); ?>
-                            </option>
-                        <?php endforeach; ?>
+                        <?php if (isset($centros) && is_array($centros)): ?>
+                            <?php foreach ($centros as $centro): ?>
+                                <option value="<?php echo htmlspecialchars($centro['cent_id'] ?? ''); ?>"
+                                        <?php echo (isset($_SESSION['old_input']['CENTRO_FORMACION_cent_id']) && $_SESSION['old_input']['CENTRO_FORMACION_cent_id'] == $centro['cent_id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($centro['cent_nombre'] ?? ''); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </select>
                 </div>
 
@@ -83,12 +113,16 @@ include __DIR__ . '/../layout/sidebar.php';
                     <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">
                         Contraseña
                     </label>
-                    <input type="password" name="inst_password" class="form-control" placeholder="Dejar vacío para usar contraseña por defecto (123456)" style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                    <input type="password" 
+                           name="inst_password" 
+                           class="form-control" 
+                           placeholder="Dejar vacío para usar contraseña por defecto (123456)" 
+                           style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
                     <small style="color: #6b7280; font-size: 12px; margin-top: 4px; display: block;">Si no ingresa una contraseña, se usará "123456" por defecto</small>
                 </div>
 
                 <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
-                    <a href="index.php" class="btn btn-secondary">Cancelar</a>
+                    <a href="/Gestion-sena/dashboard_sena/instructor/index" class="btn btn-secondary">Cancelar</a>
                     <button type="submit" class="btn btn-primary">Guardar Instructor</button>
                 </div>
             </form>
@@ -96,23 +130,15 @@ include __DIR__ . '/../layout/sidebar.php';
     </div>
 </div>
 
+<?php 
+// Limpiar old_input después de mostrar
+if (isset($_SESSION['old_input'])) {
+    unset($_SESSION['old_input']);
+}
+?>
+
 <script>
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
-    
-    // Focus effect en inputs
-    document.querySelectorAll('.form-control').forEach(input => {
-        input.addEventListener('focus', function() {
-            this.style.borderColor = '#39A900';
-            this.style.outline = 'none';
-            this.style.boxShadow = '0 0 0 3px rgba(57, 169, 0, 0.1)';
-        });
-        input.addEventListener('blur', function() {
-            this.style.borderColor = '#e5e7eb';
-            this.style.boxShadow = 'none';
-        });
-    });
 </script>
-
-<?php include __DIR__ . '/../layout/footer.php'; ?>

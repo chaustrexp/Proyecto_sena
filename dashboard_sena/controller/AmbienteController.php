@@ -14,88 +14,144 @@ class AmbienteController extends BaseController {
     }
     
     public function index() {
+        $registros = $this->model->getAll();
+        
         $data = [
             'pageTitle' => 'Gestión de Ambientes',
-            'registros' => $this->model->getAll(),
+            'registros' => $registros,
+            'totalAmbientes' => count($registros),
             'mensaje' => $this->getFlashMessage()
         ];
+        
         $this->render('index', $data);
     }
     
     public function crear() {
+        // Si es POST, procesar el formulario
         if ($this->isMethod('POST')) {
-            return $this->store();
+            $this->store();
+            return;
         }
+        
+        // Si es GET, mostrar el formulario
         $data = [
             'pageTitle' => 'Nuevo Ambiente',
             'sedes' => $this->sedeModel->getAll()
         ];
+        
         $this->render('crear', $data);
     }
     
     public function store() {
-        $errors = $this->validate($_POST, ['codigo', 'nombre', 'capacidad', 'tipo', 'sede_id']);
+        $errors = $this->validate($_POST, ['codigo', 'nombre', 'sede_id']);
+        
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['old_input'] = $_POST;
-            $this->redirect('crear.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/ambiente/crear');
         }
+        
         try {
             $this->model->create($_POST);
-            $this->redirect('index.php?msg=creado');
+            $_SESSION['success'] = 'Ambiente creado exitosamente';
+            $this->redirect('/Gestion-sena/dashboard_sena/ambiente');
         } catch (Exception $e) {
-            $_SESSION['error'] = 'Error: ' . $e->getMessage();
-            $this->redirect('crear.php');
+            $_SESSION['error'] = 'Error al crear ambiente: ' . $e->getMessage();
+            $_SESSION['old_input'] = $_POST;
+            $this->redirect('/Gestion-sena/dashboard_sena/ambiente/crear');
         }
     }
     
     public function ver() {
         $id = $this->get('id', 0);
-        if (!$id) $this->redirect('index.php');
+        
+        if (!$id) {
+            $_SESSION['error'] = 'ID no válido';
+            $this->redirect('/Gestion-sena/dashboard_sena/ambiente');
+        }
+        
         $registro = $this->model->getById($id);
-        if (!$registro) $this->redirect('index.php?msg=no_encontrado');
-        $this->render('ver', ['pageTitle' => 'Ver Ambiente', 'registro' => $registro]);
+        
+        if (!$registro) {
+            $_SESSION['error'] = 'Ambiente no encontrado';
+            $this->redirect('/Gestion-sena/dashboard_sena/ambiente');
+        }
+        
+        $data = [
+            'pageTitle' => 'Ver Ambiente',
+            'registro' => $registro
+        ];
+        
+        $this->render('ver', $data);
     }
     
     public function editar() {
         $id = $this->get('id', 0);
-        if (!$id) $this->redirect('index.php');
-        if ($this->isMethod('POST')) return $this->update($id);
+        
+        if (!$id) {
+            $_SESSION['error'] = 'ID no válido';
+            $this->redirect('/Gestion-sena/dashboard_sena/ambiente');
+        }
+        
+        // Si es POST, procesar el formulario
+        if ($this->isMethod('POST')) {
+            $this->update($id);
+            return;
+        }
+        
+        // Si es GET, mostrar el formulario
         $registro = $this->model->getById($id);
-        if (!$registro) $this->redirect('index.php?msg=no_encontrado');
+        
+        if (!$registro) {
+            $_SESSION['error'] = 'Ambiente no encontrado';
+            $this->redirect('/Gestion-sena/dashboard_sena/ambiente');
+        }
+        
         $data = [
             'pageTitle' => 'Editar Ambiente',
             'registro' => $registro,
             'sedes' => $this->sedeModel->getAll()
         ];
+        
         $this->render('editar', $data);
     }
     
     public function update($id) {
-        $errors = $this->validate($_POST, ['codigo', 'nombre', 'capacidad', 'tipo', 'sede_id']);
+        $errors = $this->validate($_POST, ['nombre', 'sede_id']);
+        
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
-            $this->redirect("editar.php?id={$id}");
+            $_SESSION['old_input'] = $_POST;
+            $this->redirect("/Gestion-sena/dashboard_sena/ambiente/editar?id={$id}");
         }
+        
         try {
             $this->model->update($id, $_POST);
-            $this->redirect('index.php?msg=actualizado');
+            $_SESSION['success'] = 'Ambiente actualizado exitosamente';
+            $this->redirect('/Gestion-sena/dashboard_sena/ambiente');
         } catch (Exception $e) {
-            $_SESSION['error'] = 'Error: ' . $e->getMessage();
-            $this->redirect("editar.php?id={$id}");
+            $_SESSION['error'] = 'Error al actualizar ambiente: ' . $e->getMessage();
+            $_SESSION['old_input'] = $_POST;
+            $this->redirect("/Gestion-sena/dashboard_sena/ambiente/editar?id={$id}");
         }
     }
     
     public function eliminar() {
         $id = $this->get('id', 0);
-        if (!$id) $this->redirect('index.php');
+        
+        if (!$id) {
+            $_SESSION['error'] = 'ID no válido';
+            $this->redirect('/Gestion-sena/dashboard_sena/ambiente');
+        }
+        
         try {
             $this->model->delete($id);
-            $this->redirect('index.php?msg=eliminado');
+            $_SESSION['success'] = 'Ambiente eliminado exitosamente';
         } catch (Exception $e) {
-            $_SESSION['error'] = 'Error: ' . $e->getMessage();
-            $this->redirect('index.php');
+            $_SESSION['error'] = 'Error al eliminar ambiente: ' . $e->getMessage();
         }
+        
+        $this->redirect('/Gestion-sena/dashboard_sena/ambiente');
     }
 }
 ?>

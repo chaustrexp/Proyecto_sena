@@ -5,6 +5,6 @@
  */
 
 // Redirigir al dashboard a través del routing
-header('Location: /Gestion-sena/dashboard_sena/dashboard');
+header('Location: /Gestion-sena/dashboard_sena/dashboard/index');
 exit;
 ?>

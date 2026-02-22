@@ -175,7 +175,7 @@ include __DIR__ . '/../layout/sidebar.php';
                         <td colspan="7" style="text-align: center; padding: 60px 20px; color: #6b7280;">
                             <div style="font-size: 48px; margin-bottom: 16px;">📅</div>
                             <p style="margin: 0 0 16px; font-size: 16px;">No hay asignaciones registradas</p>
-                            <a href="crear.php" class="btn btn-primary btn-sm">Crear Primera Asignación</a>
+                            <a href="/Gestion-sena/dashboard_sena/asignacion/crear" class="btn btn-primary btn-sm">Crear Primera Asignación</a>
                         </td>
                     </tr>
                     <?php else: ?>
@@ -215,8 +215,8 @@ include __DIR__ . '/../layout/sidebar.php';
                             </td>
                             <td style="padding: 16px;">
                                 <div class="btn-group" style="justify-content: flex-end;">
-                                    <a href="ver.php?id=<?php echo $registro['asig_id'] ?? $registro['ASIG_ID']; ?>" class="btn btn-secondary btn-sm">Ver</a>
-                                    <a href="editar.php?id=<?php echo $registro['asig_id'] ?? $registro['ASIG_ID']; ?>" class="btn btn-primary btn-sm">Editar</a>
+                                    <a href="/Gestion-sena/dashboard_sena/asignacion/ver/<?php echo $registro['asig_id'] ?? $registro['ASIG_ID']; ?>" class="btn btn-secondary btn-sm">Ver</a>
+                                    <a href="/Gestion-sena/dashboard_sena/asignacion/editar/<?php echo $registro['asig_id'] ?? $registro['ASIG_ID']; ?>" class="btn btn-primary btn-sm">Editar</a>
                                     <button onclick="confirmarEliminacion(<?php echo $registro['asig_id'] ?? $registro['ASIG_ID']; ?>, 'asignacion')" class="btn btn-danger btn-sm">Eliminar</button>
                                 </div>
                             </td>
@@ -773,8 +773,8 @@ include __DIR__ . '/../layout/sidebar.php';
                             <div style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; gap: 12px;">
                                 <button onclick="document.getElementById('modalDetalle').remove()" class="btn btn-secondary">Cerrar</button>
                                 <div style="display: flex; gap: 8px;">
-                                    <a href="ver.php?id=${data.id}" class="btn btn-secondary btn-sm">Ver Completo</a>
-                                    <a href="editar.php?id=${data.id}" class="btn btn-primary btn-sm">Editar</a>
+                                    <a href="/Gestion-sena/dashboard_sena/asignacion/ver/${data.id}" class="btn btn-secondary btn-sm">Ver Completo</a>
+                                    <a href="/Gestion-sena/dashboard_sena/asignacion/editar/${data.id}" class="btn btn-primary btn-sm">Editar</a>
                                 </div>
                             </div>
                         </div>
@@ -810,7 +810,7 @@ include __DIR__ . '/../layout/sidebar.php';
                             </div>
 
                             <!-- Contenido -->
-                            <form id="createForm" method="POST" action="crear.php" onsubmit="return validateForm(event)">
+                            <form id="createForm" method="POST" action="/Gestion-sena/dashboard_sena/asignacion/crear" onsubmit="return validateForm(event)">
                                 <div style="padding: 24px;">
                                     
                                     <!-- Sección: Información del Evento -->

@@ -9,7 +9,7 @@
         <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 32px;">
             <!-- Header dentro del formulario -->
             <div style="margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid #e5e7eb;">
-                <a href="/Gestion-sena/dashboard_sena/programa" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; margin-bottom: 16px; font-size: 14px; transition: color 0.2s;">
+                <a href="/Gestion-sena/dashboard_sena/programa/index" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; margin-bottom: 16px; font-size: 14px; transition: color 0.2s;">
                     <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
                     Volver a Programas
                 </a>
@@ -75,7 +75,7 @@
                 </div>
 
                 <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
-                    <a href="/Gestion-sena/dashboard_sena/programa" class="btn btn-secondary">Cancelar</a>
+                    <a href="/Gestion-sena/dashboard_sena/programa/index" class="btn btn-secondary">Cancelar</a>
                     <button type="submit" class="btn btn-primary">Guardar Programa</button>
                 </div>
             </form>

@@ -25,9 +25,9 @@ class CompetenciaModel {
             VALUES (?, ?, ?)
         ");
         return $stmt->execute([
-            $data['comp_nombre_corto'],
-            $data['comp_horas'] ?? null,
-            $data['comp_nombre_unidad_competencia']
+            $data['nombre_corto'],
+            $data['horas'] ?? null,
+            $data['nombre_unidad_competencia']
         ]);
     }
     
@@ -38,9 +38,9 @@ class CompetenciaModel {
             WHERE comp_id = ?
         ");
         return $stmt->execute([
-            $data['comp_nombre_corto'],
-            $data['comp_horas'],
-            $data['comp_nombre_unidad_competencia'],
+            $data['nombre_corto'],
+            $data['horas'],
+            $data['nombre_unidad_competencia'],
             $id
         ]);
     }

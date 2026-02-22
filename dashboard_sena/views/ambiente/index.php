@@ -1,18 +1,6 @@
 <?php
-require_once __DIR__ . '/../../model/AmbienteModel.php';
-
-$model = new AmbienteModel();
-
-if (isset($_GET['eliminar'])) {
-    $model->delete($_GET['eliminar']);
-    header('Location: index.php?msg=eliminado');
-    exit;
-}
-
-$registros = $model->getAll();
-$pageTitle = "Gestión de Ambientes";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+// Vista de index ambiente
+// Los datos vienen del controlador: $pageTitle, $registros, $totalAmbientes, $mensaje
 ?>
 
 <div class="main-content">
@@ -22,39 +10,41 @@ include __DIR__ . '/../layout/sidebar.php';
             <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">Ambientes de Formación</h1>
             <p style="font-size: 14px; color: #6b7280; margin: 0;">Gestiona los espacios físicos para la formación</p>
         </div>
-        <a href="crear.php" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+        <a href="/Gestion-sena/dashboard_sena/ambiente/crear" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
             <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
             Nuevo Ambiente
         </a>
     </div>
 
-    <!-- Alert -->
-    <?php if (isset($_GET['msg'])): ?>
+    <!-- Alert Messages -->
+    <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success" style="margin: 24px 32px;">
-            <?php 
-            if ($_GET['msg'] == 'creado') echo '✓ Ambiente creado exitosamente';
-            if ($_GET['msg'] == 'actualizado') echo '✓ Ambiente actualizado exitosamente';
-            if ($_GET['msg'] == 'eliminado') echo '✓ Ambiente eliminado exitosamente';
-            ?>
+            ✓ <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-error" style="margin: 24px 32px;">
+            ✗ <?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php if (isset($mensaje)): ?>
+        <div class="alert alert-success" style="margin: 24px 32px;">
+            ✓ <?php echo htmlspecialchars($mensaje); ?>
         </div>
     <?php endif; ?>
 
     <!-- Stats -->
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 24px 32px;">
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 24px 32px;">
         <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
             <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Total Ambientes</div>
-            <div style="font-size: 32px; font-weight: 700; color: #f59e0b;"><?php echo count($registros); ?></div>
+            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;"><?php echo $totalAmbientes ?? count($registros ?? []); ?></div>
         </div>
         <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
-            <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Sedes Activas</div>
-            <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">
-                <?php echo count(array_unique(array_column($registros, 'SEDE_sede_id'))); ?>
-            </div>
-        </div>
-        <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
-            <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Ambientes Activos</div>
+            <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Activos</div>
             <div style="font-size: 32px; font-weight: 700; color: #10b981;">
-                <?php echo count($registros); ?>
+                <?php echo $totalAmbientes ?? count($registros ?? []); ?>
             </div>
         </div>
     </div>
@@ -65,50 +55,40 @@ include __DIR__ . '/../layout/sidebar.php';
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                        <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Código</th>
+                        <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; width: 120px;">Código</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Nombre</th>
-                        <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Capacidad</th>
-                        <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Tipo</th>
                         <th style="padding: 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Sede</th>
-                        <th style="padding: 16px; text-align: right; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Acciones</th>
+                        <th style="padding: 16px; text-align: right; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; width: 250px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($registros)): ?>
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 60px 20px; color: #6b7280;">
+                        <td colspan="4" style="text-align: center; padding: 60px 20px; color: #6b7280;">
                             <div style="font-size: 48px; margin-bottom: 16px;">🏢</div>
                             <p style="margin: 0 0 16px; font-size: 16px;">No hay ambientes registrados</p>
-                            <a href="crear.php" class="btn btn-primary btn-sm">Crear Primer Ambiente</a>
+                            <a href="/Gestion-sena/dashboard_sena/ambiente/crear" class="btn btn-primary btn-sm">Crear Primer Ambiente</a>
                         </td>
                     </tr>
                     <?php else: ?>
                         <?php foreach ($registros as $registro): ?>
                         <tr style="border-bottom: 1px solid #f3f4f6;">
                             <td style="padding: 16px;">
-                                <strong style="color: #f59e0b; font-size: 14px;"><?php echo htmlspecialchars($registro['amb_id'] ?? ''); ?></strong>
+                                <strong style="color: #3b82f6; font-size: 14px;"><?php echo htmlspecialchars($registro['amb_id'] ?? ''); ?></strong>
                             </td>
                             <td style="padding: 16px;">
                                 <div style="font-weight: 600; color: #1f2937;"><?php echo htmlspecialchars($registro['amb_nombre'] ?? ''); ?></div>
                             </td>
                             <td style="padding: 16px;">
-                                <span style="background: #EFF6FF; color: #3b82f6; padding: 6px 12px; border-radius: 12px; font-size: 14px; font-weight: 700;">
-                                    N/A
-                                </span>
-                            </td>
-                            <td style="padding: 16px; color: #6b7280;">
-                                N/A
-                            </td>
-                            <td style="padding: 16px;">
-                                <span style="background: #FEF3C7; color: #f59e0b; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                <span style="background: #EFF6FF; color: #3b82f6; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
                                     <?php echo htmlspecialchars($registro['sede_nombre'] ?? 'Sin sede'); ?>
                                 </span>
                             </td>
                             <td style="padding: 16px;">
                                 <div class="btn-group" style="justify-content: flex-end;">
-                                    <a href="ver.php?id=<?php echo htmlspecialchars($registro['amb_id']); ?>" class="btn btn-secondary btn-sm">Ver</a>
-                                    <a href="editar.php?id=<?php echo htmlspecialchars($registro['amb_id']); ?>" class="btn btn-primary btn-sm">Editar</a>
-                                    <button onclick="confirmarEliminacion('<?php echo htmlspecialchars($registro['amb_id']); ?>', 'ambiente')" class="btn btn-danger btn-sm">Eliminar</button>
+                                    <a href="/Gestion-sena/dashboard_sena/ambiente/ver?id=<?php echo $registro['amb_id']; ?>" class="btn btn-secondary btn-sm">Ver</a>
+                                    <a href="/Gestion-sena/dashboard_sena/ambiente/editar?id=<?php echo $registro['amb_id']; ?>" class="btn btn-primary btn-sm">Editar</a>
+                                    <button onclick="confirmarEliminacion(<?php echo $registro['amb_id']; ?>)" class="btn btn-danger btn-sm">Eliminar</button>
                                 </div>
                             </td>
                         </tr>
@@ -135,6 +115,10 @@ include __DIR__ . '/../layout/sidebar.php';
             });
         }
     });
+    
+    function confirmarEliminacion(id) {
+        if (confirm('¿Está seguro de eliminar este ambiente?')) {
+            window.location.href = `/Gestion-sena/dashboard_sena/ambiente/eliminar?id=${id}`;
+        }
+    }
 </script>
-
-<?php include __DIR__ . '/../layout/footer.php'; ?>

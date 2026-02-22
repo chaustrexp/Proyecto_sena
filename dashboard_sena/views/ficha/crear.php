@@ -25,7 +25,7 @@ include __DIR__ . '/../layout/sidebar.php';
     <!-- Header -->
     <div style="padding: 32px 32px 24px; border-bottom: 1px solid #e5e7eb;">
         <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 4px;">
-            <a href="/Gestion-sena/dashboard_sena/ficha" style="color: #6b7280; hover:color: #39A900;">
+            <a href="/Gestion-sena/dashboard_sena/ficha/index" style="color: #6b7280; hover:color: #39A900;">
                 <i data-lucide="arrow-left" style="width: 20px; height: 20px;"></i>
             </a>
             <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0;">Nueva Ficha</h1>
@@ -178,7 +178,7 @@ include __DIR__ . '/../layout/sidebar.php';
 
                 <!-- Botones -->
                 <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
-                    <a href="/Gestion-sena/dashboard_sena/ficha" class="btn btn-secondary">Cancelar</a>
+                    <a href="/Gestion-sena/dashboard_sena/ficha/index" class="btn btn-secondary">Cancelar</a>
                     <button type="submit" class="btn btn-primary">
                         <i data-lucide="save" style="width: 16px; height: 16px;"></i>
                         Guardar Ficha

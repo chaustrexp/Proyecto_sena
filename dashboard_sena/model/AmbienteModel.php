@@ -30,19 +30,26 @@ class AmbienteModel {
     }
     
     public function create($data) {
-        $stmt = $this->db->prepare("INSERT INTO AMBIENTE (amb_id, amb_nombre, SEDE_sede_id) VALUES (?, ?, ?)");
+        $stmt = $this->db->prepare("
+            INSERT INTO AMBIENTE (amb_id, amb_nombre, SEDE_sede_id) 
+            VALUES (?, ?, ?)
+        ");
         return $stmt->execute([
-            $data['amb_id'],
-            $data['amb_nombre'],
-            $data['SEDE_sede_id']
+            $data['codigo'],
+            $data['nombre'],
+            $data['sede_id']
         ]);
     }
     
     public function update($id, $data) {
-        $stmt = $this->db->prepare("UPDATE AMBIENTE SET amb_nombre = ?, SEDE_sede_id = ? WHERE amb_id = ?");
+        $stmt = $this->db->prepare("
+            UPDATE AMBIENTE 
+            SET amb_nombre = ?, SEDE_sede_id = ? 
+            WHERE amb_id = ?
+        ");
         return $stmt->execute([
-            $data['amb_nombre'],
-            $data['SEDE_sede_id'],
+            $data['nombre'],
+            $data['sede_id'],
             $id
         ]);
     }

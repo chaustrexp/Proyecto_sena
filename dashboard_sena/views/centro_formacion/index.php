@@ -1,18 +1,5 @@
 <?php
-require_once __DIR__ . '/../../model/CentroFormacionModel.php';
-
-$model = new CentroFormacionModel();
-
-if (isset($_GET['eliminar'])) {
-    $model->delete($_GET['eliminar']);
-    header('Location: index.php?msg=eliminado');
-    exit;
-}
-
-$registros = $model->getAll();
-$pageTitle = "Gestión de Centros de Formación";
-include __DIR__ . '/../layout/header.php';
-include __DIR__ . '/../layout/sidebar.php';
+$registros = $data['registros'] ?? [];
 ?>
 
 <div class="main-content">
@@ -22,19 +9,27 @@ include __DIR__ . '/../layout/sidebar.php';
             <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0 0 4px;">Centros de Formación</h1>
             <p style="font-size: 14px; color: #6b7280; margin: 0;">Gestiona los centros de formación del SENA</p>
         </div>
-        <a href="crear.php" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+        <a href="/Gestion-sena/dashboard_sena/centro_formacion/crear" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
             <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
             Nuevo Centro
         </a>
     </div>
 
     <!-- Alert -->
-    <?php if (isset($_GET['msg'])): ?>
+    <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success" style="margin: 24px 32px;">
             <?php 
-            if ($_GET['msg'] == 'creado') echo '✓ Centro creado exitosamente';
-            if ($_GET['msg'] == 'actualizado') echo '✓ Centro actualizado exitosamente';
-            if ($_GET['msg'] == 'eliminado') echo '✓ Centro eliminado exitosamente';
+            echo $_SESSION['success'];
+            unset($_SESSION['success']);
+            ?>
+        </div>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger" style="margin: 24px 32px;">
+            <?php 
+            echo $_SESSION['error'];
+            unset($_SESSION['error']);
             ?>
         </div>
     <?php endif; ?>
@@ -68,7 +63,7 @@ include __DIR__ . '/../layout/sidebar.php';
                         <td colspan="3" style="text-align: center; padding: 60px 20px; color: #6b7280;">
                             <div style="font-size: 48px; margin-bottom: 16px;">🏛️</div>
                             <p style="margin: 0 0 16px; font-size: 16px;">No hay centros registrados</p>
-                            <a href="crear.php" class="btn btn-primary btn-sm">Crear Primer Centro</a>
+                            <a href="/Gestion-sena/dashboard_sena/centro_formacion/crear" class="btn btn-primary btn-sm">Crear Primer Centro</a>
                         </td>
                     </tr>
                     <?php else: ?>
@@ -82,9 +77,9 @@ include __DIR__ . '/../layout/sidebar.php';
                             </td>
                             <td style="padding: 16px;">
                                 <div class="btn-group" style="justify-content: flex-end;">
-                                    <a href="ver.php?id=<?php echo $registro['cent_id']; ?>" class="btn btn-secondary btn-sm">Ver</a>
-                                    <a href="editar.php?id=<?php echo $registro['cent_id']; ?>" class="btn btn-primary btn-sm">Editar</a>
-                                    <button onclick="confirmarEliminacion(<?php echo $registro['cent_id']; ?>, 'centro_formacion')" class="btn btn-danger btn-sm">Eliminar</button>
+                                    <a href="/Gestion-sena/dashboard_sena/centro_formacion/ver/<?php echo $registro['cent_id']; ?>" class="btn btn-secondary btn-sm">Ver</a>
+                                    <a href="/Gestion-sena/dashboard_sena/centro_formacion/editar/<?php echo $registro['cent_id']; ?>" class="btn btn-primary btn-sm">Editar</a>
+                                    <a href="/Gestion-sena/dashboard_sena/centro_formacion/eliminar/<?php echo $registro['cent_id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar este centro?')">Eliminar</a>
                                 </div>
                             </td>
                         </tr>
@@ -100,17 +95,6 @@ include __DIR__ . '/../layout/sidebar.php';
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
-    
-    document.querySelectorAll('tbody tr').forEach(row => {
-        if (row.cells.length > 1) {
-            row.addEventListener('mouseenter', function() {
-                this.style.background = '#f9fafb';
-            });
-            row.addEventListener('mouseleave', function() {
-                this.style.background = 'white';
-            });
-        }
-    });
 </script>
 
 <?php include __DIR__ . '/../layout/footer.php'; ?>

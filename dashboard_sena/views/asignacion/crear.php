@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../auth/check_auth.php';
+require_once __DIR__ . '/../../helpers/functions.php';
 require_once __DIR__ . '/../../model/AsignacionModel.php';
 require_once __DIR__ . '/../../model/FichaModel.php';
 require_once __DIR__ . '/../../model/InstructorModel.php';

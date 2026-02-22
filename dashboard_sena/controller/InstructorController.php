@@ -43,21 +43,22 @@ class InstructorController extends BaseController {
     }
     
     public function store() {
-        $errors = $this->validate($_POST, ['nombres', 'apellidos', 'correo', 'centro_id']);
+        $errors = $this->validate($_POST, ['inst_nombres', 'inst_apellidos', 'inst_correo', 'CENTRO_FORMACION_cent_id']);
         
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['old_input'] = $_POST;
-            $this->redirect('crear.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/instructor/crear');
         }
         
         try {
             $this->model->create($_POST);
-            $this->redirect('index.php?msg=creado');
+            $_SESSION['success'] = 'Instructor creado exitosamente';
+            $this->redirect('/Gestion-sena/dashboard_sena/instructor');
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al crear el instructor: ' . $e->getMessage();
             $_SESSION['old_input'] = $_POST;
-            $this->redirect('crear.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/instructor/crear');
         }
     }
     
@@ -65,13 +66,15 @@ class InstructorController extends BaseController {
         $id = $this->get('id', 0);
         
         if (!$id) {
-            $this->redirect('index.php');
+            $_SESSION['error'] = 'ID no válido';
+            $this->redirect('/Gestion-sena/dashboard_sena/instructor');
         }
         
         $registro = $this->model->getById($id);
         
         if (!$registro) {
-            $this->redirect('index.php?msg=no_encontrado');
+            $_SESSION['error'] = 'Instructor no encontrado';
+            $this->redirect('/Gestion-sena/dashboard_sena/instructor');
         }
         
         $data = [
@@ -86,17 +89,22 @@ class InstructorController extends BaseController {
         $id = $this->get('id', 0);
         
         if (!$id) {
-            $this->redirect('index.php');
+            $_SESSION['error'] = 'ID no válido';
+            $this->redirect('/Gestion-sena/dashboard_sena/instructor');
         }
         
+        // Si es POST, procesar el formulario
         if ($this->isMethod('POST')) {
-            return $this->update($id);
+            $this->update($id);
+            return;
         }
         
+        // Si es GET, mostrar el formulario
         $registro = $this->model->getById($id);
         
         if (!$registro) {
-            $this->redirect('index.php?msg=no_encontrado');
+            $_SESSION['error'] = 'Instructor no encontrado';
+            $this->redirect('/Gestion-sena/dashboard_sena/instructor');
         }
         
         $data = [
@@ -109,21 +117,22 @@ class InstructorController extends BaseController {
     }
     
     public function update($id) {
-        $errors = $this->validate($_POST, ['nombres', 'apellidos', 'correo', 'centro_id']);
+        $errors = $this->validate($_POST, ['inst_nombres', 'inst_apellidos', 'inst_correo', 'CENTRO_FORMACION_cent_id']);
         
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['old_input'] = $_POST;
-            $this->redirect("editar.php?id={$id}");
+            $this->redirect("/Gestion-sena/dashboard_sena/instructor/editar?id={$id}");
         }
         
         try {
             $this->model->update($id, $_POST);
-            $this->redirect('index.php?msg=actualizado');
+            $_SESSION['success'] = 'Instructor actualizado exitosamente';
+            $this->redirect('/Gestion-sena/dashboard_sena/instructor');
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al actualizar el instructor: ' . $e->getMessage();
             $_SESSION['old_input'] = $_POST;
-            $this->redirect("editar.php?id={$id}");
+            $this->redirect("/Gestion-sena/dashboard_sena/instructor/editar?id={$id}");
         }
     }
     
@@ -131,16 +140,18 @@ class InstructorController extends BaseController {
         $id = $this->get('id', 0);
         
         if (!$id) {
-            $this->redirect('index.php');
+            $_SESSION['error'] = 'ID no válido';
+            $this->redirect('/Gestion-sena/dashboard_sena/instructor');
         }
         
         try {
             $this->model->delete($id);
-            $this->redirect('index.php?msg=eliminado');
+            $_SESSION['success'] = 'Instructor eliminado exitosamente';
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al eliminar el instructor: ' . $e->getMessage();
-            $this->redirect('index.php');
         }
+        
+        $this->redirect('/Gestion-sena/dashboard_sena/instructor');
     }
 }
 ?>

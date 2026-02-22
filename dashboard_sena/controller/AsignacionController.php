@@ -93,16 +93,16 @@ class AsignacionController extends BaseController {
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['old_input'] = $_POST;
-            $this->redirect('crear.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/asignacion/crear');
         }
         
         try {
             $this->model->create($_POST);
-            $this->redirect('index.php?msg=creado');
+            $this->redirect('/Gestion-sena/dashboard_sena/asignacion?msg=creado');
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al crear la asignación: ' . $e->getMessage();
             $_SESSION['old_input'] = $_POST;
-            $this->redirect('crear.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/asignacion/crear');
         }
     }
     
@@ -113,13 +113,13 @@ class AsignacionController extends BaseController {
         $id = $this->get('id', 0);
         
         if (!$id) {
-            $this->redirect('index.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/asignacion');
         }
         
         $registro = $this->model->getById($id);
         
         if (!$registro) {
-            $this->redirect('index.php?msg=no_encontrado');
+            $this->redirect('/Gestion-sena/dashboard_sena/asignacion?msg=no_encontrado');
         }
         
         $data = [
@@ -137,7 +137,7 @@ class AsignacionController extends BaseController {
         $id = $this->get('id', 0);
         
         if (!$id) {
-            $this->redirect('index.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/asignacion');
         }
         
         if ($this->isMethod('POST')) {
@@ -147,7 +147,7 @@ class AsignacionController extends BaseController {
         $registro = $this->model->getById($id);
         
         if (!$registro) {
-            $this->redirect('index.php?msg=no_encontrado');
+            $this->redirect('/Gestion-sena/dashboard_sena/asignacion?msg=no_encontrado');
         }
         
         $data = [
@@ -177,16 +177,16 @@ class AsignacionController extends BaseController {
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['old_input'] = $_POST;
-            $this->redirect("editar.php?id={$id}");
+            $this->redirect("/Gestion-sena/dashboard_sena/asignacion/editar/{$id}");
         }
         
         try {
             $this->model->update($id, $_POST);
-            $this->redirect('index.php?msg=actualizado');
+            $this->redirect('/Gestion-sena/dashboard_sena/asignacion?msg=actualizado');
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al actualizar la asignación: ' . $e->getMessage();
             $_SESSION['old_input'] = $_POST;
-            $this->redirect("editar.php?id={$id}");
+            $this->redirect("/Gestion-sena/dashboard_sena/asignacion/editar/{$id}");
         }
     }
     
@@ -197,15 +197,15 @@ class AsignacionController extends BaseController {
         $id = $this->get('id', 0);
         
         if (!$id) {
-            $this->redirect('index.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/asignacion');
         }
         
         try {
             $this->model->delete($id);
-            $this->redirect('index.php?msg=eliminado');
+            $this->redirect('/Gestion-sena/dashboard_sena/asignacion?msg=eliminado');
         } catch (Exception $e) {
             $_SESSION['error'] = 'Error al eliminar la asignación: ' . $e->getMessage();
-            $this->redirect('index.php');
+            $this->redirect('/Gestion-sena/dashboard_sena/asignacion');
         }
     }
     

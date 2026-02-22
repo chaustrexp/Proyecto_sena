@@ -20,7 +20,7 @@
         <ul class="nav-list">
             <!-- Dashboard -->
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/dashboard" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/dashboard/index" class="nav-link">
                     <i class="nav-icon" data-lucide="layout-dashboard"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
@@ -32,35 +32,35 @@
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/programa" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/programa/index" class="nav-link">
                     <i class="nav-icon" data-lucide="book-open"></i>
                     <span class="nav-text">Programas</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/ficha" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/ficha/index" class="nav-link">
                     <i class="nav-icon" data-lucide="file-text"></i>
                     <span class="nav-text">Fichas</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/competencia" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/competencia/index" class="nav-link">
                     <i class="nav-icon" data-lucide="target"></i>
                     <span class="nav-text">Competencias</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/competencia_programa/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/competencia_programa/index" class="nav-link">
                     <i class="nav-icon" data-lucide="link"></i>
                     <span class="nav-text">Competencia-Programa</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/titulo_programa/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/titulo_programa/index" class="nav-link">
                     <i class="nav-icon" data-lucide="graduation-cap"></i>
                     <span class="nav-text">Título Programa</span>
                 </a>
@@ -72,35 +72,35 @@
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/instructor" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/instructor/index" class="nav-link">
                     <i class="nav-icon" data-lucide="user"></i>
                     <span class="nav-text">Instructores</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/instru_competencia/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/instru_competencia/index" class="nav-link">
                     <i class="nav-icon" data-lucide="award"></i>
                     <span class="nav-text">Competencias Instructor</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/ambiente" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/ambiente/index" class="nav-link">
                     <i class="nav-icon" data-lucide="home"></i>
                     <span class="nav-text">Ambientes</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/asignacion" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/asignacion/index" class="nav-link">
                     <i class="nav-icon" data-lucide="calendar"></i>
                     <span class="nav-text">Asignaciones</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/detalle_asignacion/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/detalle_asignacion/index" class="nav-link">
                     <i class="nav-icon" data-lucide="clipboard-list"></i>
                     <span class="nav-text">Detalle Asignación</span>
                 </a>
@@ -112,21 +112,21 @@
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/centro_formacion/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/centro_formacion/index" class="nav-link">
                     <i class="nav-icon" data-lucide="building-2"></i>
                     <span class="nav-text">Centro Formación</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/sede/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/sede/index" class="nav-link">
                     <i class="nav-icon" data-lucide="map-pin"></i>
                     <span class="nav-text">Sedes</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="/Gestion-sena/dashboard_sena/views/coordinacion/index.php" class="nav-link">
+                <a href="/Gestion-sena/dashboard_sena/coordinacion/index" class="nav-link">
                     <i class="nav-icon" data-lucide="users"></i>
                     <span class="nav-text">Coordinación</span>
                 </a>
